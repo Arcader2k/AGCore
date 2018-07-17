@@ -1,0 +1,8 @@
+name: AGCore
+version: 1.1.0
+main: Core.$1Listener
+description: AGCore
+
+commands:
+    agtest:
+        description: Is AGCore active?     
