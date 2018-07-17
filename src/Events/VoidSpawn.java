@@ -25,5 +25,6 @@ public class VoidSpawn
         return;
       }
     }
+    return;
   }
 }
