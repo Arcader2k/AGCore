@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import Commands.Check;
 import Events.$1PlayerMoveEvent;
 import Events.VoidSpawn;
 import Events.WorldChangeEvent;
@@ -32,7 +33,7 @@ public class $1Listener
   {
     getCommand("agtest").setExecutor(this);
     getCommand("servers").setExecutor(this);
-    getCommand("check").setExecutor(this);
+    getCommand("check").setExecutor(new Check());
     
     PluginManager pm = Bukkit.getServer().getPluginManager();
     pm.registerEvents(this, this);
@@ -48,11 +49,9 @@ public class $1Listener
             .getDescription().getVersion());
 
     this.getServer().getPluginManager().registerEvents(this, this);
-    createItem(inv, Material.DIRT, "", 11);
-    createItem(inv, Material.BLAZE_POWDER, "", 12);
-    createItem(inv, Material.STONE, "", 13);
-    createItem(inv, Material.STAINED_GLASS_PANE, "", 14);
-    createItem(inv, Material.STAINED_GLASS, "", 15);
+    createItem(inv, Material.WORKBENCH, "Factions", 11);
+    createItem(inv, Material.DIAMOND_SWORD, "KitPVP", 13);
+    createItem(inv, Material.BUCKET, "SkyBlock", 15);
     checkSlots(inv);
   }
   
@@ -68,24 +67,25 @@ public class $1Listener
           .getDescription().getVersion());
         return true;
       }
-      if(cmd.getName().equalsIgnoreCase("servers"))
-      {
-          if(!(sender instanceof Player)) 
-          {
-              sender.sendMessage("You must be in-game to use this command..");
-              return true;
-          }
-          else
-          {
-        	  ((Player) sender).openInventory(inv);
-          }
-      }
+    }
+    if(cmd.getName().equalsIgnoreCase("servers"))
+    {
+        if(!(sender instanceof Player)) 
+        {
+            sender.sendMessage("You must be in-game to use this command..");
+            return true;
+        }
+        else
+        {
+      	  ((Player) sender).openInventory(inv);
+        }
+        return true;
     }
     return false;
   }
   @EventHandler
   private void onInventoryClick(InventoryClickEvent e){
-      if(!ChatColor.stripColor(e.getInventory().getName()).equals("Hub Tools")) 
+      if(!ChatColor.stripColor(e.getInventory().getName()).equals("Available Servers")) 
       	return;
 
       if(!(e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)){
@@ -95,27 +95,17 @@ public class $1Listener
           loc.add(0, 1, 0);
 
           switch (e.getCurrentItem().getType()){
-              case DIRT:
-                  e.setCancelled(true);
-                  p.closeInventory();
-                  p.sendMessage("&2&lThis is a test..");
-                  break;
-              case BLAZE_POWDER:
-                  e.setCancelled(true);
-                  p.closeInventory();
-                  p.sendMessage("&2&lThis is a test..");
-                  break;
-              case STONE:
-                  e.setCancelled(true);
-                  p.closeInventory();
-                  p.sendMessage("&2&lThis is a test..");
-                  break;
-              case STAINED_GLASS_PANE:
+              case BUCKET:
                   e.setCancelled(true);
                   p.closeInventory();
                   p.sendMessage(color("&2&lThis is a test.."));
                   break;
-              case STAINED_GLASS:
+              case WORKBENCH:
+                  e.setCancelled(true);
+                  p.closeInventory();
+                  p.sendMessage(color("&2&lThis is a test.."));
+                  break;
+              case DIAMOND_SWORD:
                   e.setCancelled(true);
                   p.closeInventory();
                   p.sendMessage(color("&2&lThis is a test.."));
@@ -140,7 +130,7 @@ public class $1Listener
   }
 
   @SuppressWarnings("deprecation")
-private void checkSlots(Inventory inv){
+  private void checkSlots(Inventory inv){
       ItemStack space;
       space = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.GRAY.getDyeData());
       ItemMeta meta = space.getItemMeta();
