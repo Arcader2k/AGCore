@@ -1,6 +1,5 @@
 package Events;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,8 +19,8 @@ public class VoidSpawn
       {
         e.setCancelled(true);
         p.teleport(p.getWorld().getSpawnLocation());
-        p.sendMessage(ChatColor.GOLD + "It's too dark down there...");
-        p.sendMessage(ChatColor.GOLD + "Let's go back to Spawn.");
+        p.sendMessage("§6It's too dark down there...");
+        p.sendMessage("§6Let's go back to Spawn.");
         return;
       }
     }

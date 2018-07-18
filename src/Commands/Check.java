@@ -14,11 +14,6 @@ public class Check implements CommandExecutor
 {
 public boolean onCommand(CommandSender cs, Command arg1, String arg2, String[] args)
 {
-	if(!cs.hasPermission("check.use")) 
-	{
-		cs.sendMessage("§cYou do not have permission to use this!");
-	    return true;
-	}
 	if (args.length <= 0) 
 	{
 	    return false;
