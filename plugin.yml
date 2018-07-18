@@ -5,4 +5,8 @@ description: AGCore
 
 commands:
     agtest:
-        description: Is AGCore active?     
+        description: Is AGCore active?
+    servers:
+        description: Opens server list menu
+    check:
+        description:  Checks players personal Stats.    
