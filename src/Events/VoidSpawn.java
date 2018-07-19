@@ -4,22 +4,25 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 public class VoidSpawn
   implements Listener
 {
-  @EventHandler
+  @EventHandler(priority = EventPriority.HIGH)
   public void onDamage(EntityDamageEvent e)
   {
     Entity p = e.getEntity();
     if (((p instanceof Player)) && 
       (p.getWorld().getName().equalsIgnoreCase("world"))) 
     {
-      if (e.getCause() == EntityDamageEvent.DamageCause.VOID)
+      if (e.getCause() == DamageCause.VOID)
       {
-        e.setCancelled(true);
+    	e.setCancelled(true);
+    	p.sendMessage("§3Teleporting...");
         reSpawn(p);
       }
     }
