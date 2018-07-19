@@ -61,9 +61,10 @@ public class $1Listener
             .getDescription().getVersion());
     console.sendMessage("§b------------------------------------------");
 
-    createItem(inv, Material.WORKBENCH, "Factions", 11);
-    createItem(inv, Material.DIAMOND_SWORD, "KitPVP", 13);
-    createItem(inv, Material.BUCKET, "SkyBlock", 15);
+    createItem(inv, Material.WORKBENCH, "Factions", 10);
+    createItem(inv, Material.DIAMOND_SWORD, "KitPVP", 12);
+    createItem(inv, Material.BUCKET, "SkyBlock", 14);
+    createItem(inv, Material.NETHER_STAR, "Hub", 16);
     checkSlots(inv);
     
     plugin = getDataFolder();
@@ -82,7 +83,7 @@ public class $1Listener
       }
       catch (IOException e) 
       {
-    	  //
+    	  e.printStackTrace();
       }
     }
     getConfig().options().copyDefaults(true);
@@ -136,23 +137,26 @@ public class $1Listener
           Player p = (Player) e.getWhoClicked();
 
           switch (e.getCurrentItem().getType()){
+              case NETHER_STAR:
+        	      e.setCancelled(true);
+        	      p.closeInventory();
+        	      teleportToServer(p, getConfig().getString("Server1"));
               case BUCKET:
-            	  e.setCancelled(true);
-                  p.closeInventory();
-                  teleportToServer(p, getConfig().getString("Server1"));
-                  break;
-              case WORKBENCH:
             	  e.setCancelled(true);
                   p.closeInventory();
                   teleportToServer(p, getConfig().getString("Server2"));
                   break;
-              case DIAMOND_SWORD:
+              case WORKBENCH:
             	  e.setCancelled(true);
                   p.closeInventory();
                   teleportToServer(p, getConfig().getString("Server3"));
                   break;
-              default:
+              case DIAMOND_SWORD:
             	  e.setCancelled(true);
+                  p.closeInventory();
+                  teleportToServer(p, getConfig().getString("Server4"));
+                  break;
+              default:
                   break;
           }
       }
