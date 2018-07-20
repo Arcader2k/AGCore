@@ -1,6 +1,5 @@
 package Events;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,19 +20,16 @@ public class VoidSpawn
     {
       if (e.getCause() == DamageCause.VOID)
       {
-    	e.setCancelled(true);
-    	p.sendMessage("§3Teleporting...");
-        reSpawn(p);
+    	  e.setCancelled(true);
+    	  p.sendMessage("§3Teleporting...");
+          reSpawn((Player) p);
       }
     }
   }
   
-  public static void reSpawn(Entity p) 
+  public static void reSpawn(Player player) 
   {
-    Double X = p.getWorld().getSpawnLocation().getX();
-    Double Y = p.getWorld().getSpawnLocation().getY();
-    Double Z = p.getWorld().getSpawnLocation().getZ();
-    Location loc = new Location(p.getWorld(), X, Y, Z);
-    p.teleport(loc);
+	  player.teleport(player.getWorld().getSpawnLocation());
+	  player.setFallDistance(0);
   }
 }

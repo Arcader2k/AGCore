@@ -4,5 +4,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="C:/Users/Infin/OneDrive/Documents/Newfolder/Spigot/Spigot-API/target/spigot-api-1.12.2-R0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Infin/OneDrive/Documents/Newfolder/Spigot/Spigot-Server/target/spigot-1.12.2-R0.1-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Infin/OneDrive/Desktop/Network/Bungee/BungeeCord.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
