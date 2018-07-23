@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -22,6 +23,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import Commands.Check;
 import Events.$1PlayerMoveEvent;
@@ -32,6 +34,7 @@ public class Main
   extends JavaPlugin
   implements Listener
 {
+	private int count;
 	public static File plugin;
 	public static File configFile;
 	public static FileConfiguration config;
@@ -40,6 +43,8 @@ public class Main
 	
   public void onEnable()
   {
+	getCommand("setspawn").setExecutor(this);
+	getCommand("spawn").setExecutor(this);
     getCommand("agtest").setExecutor(this);
     getCommand("servers").setExecutor(this);
     getCommand("check").setExecutor(new Check());
@@ -61,43 +66,74 @@ public class Main
             .getDescription().getVersion());
     console.sendMessage("§b------------------------------------------");
     
-    plugin = getDataFolder();
-    configFile = new File(plugin, "config.yml");
+    loadConfig();
     
-    config = new YamlConfiguration();
-    if (!plugin.exists()) 
-    {
-      plugin.mkdir();
-    }
-    if (!configFile.exists()) 
-    {
-      try
-      {
-        configFile.createNewFile();
-      }
-      catch (IOException e) 
-      {
-    	  e.printStackTrace();
-      }
-    }
-    getConfig().options().copyDefaults(true);
-    saveConfig();
   }
   
   public boolean onCommand(CommandSender sender, Command cmd, String label, String[] arg)
   {
 	  Player p = (Player) sender;
 	  if(cmd.getName().equalsIgnoreCase("agcore")) 
-		{
-			sender.sendMessage("§bThis plugin was created by Arcader2k");
-			return true;
-		}
+	  {
+		  if(sender instanceof Player)
+		  {
+			  sender.sendMessage(getConfig().getString("Prefix").replace('&', '§') + " §bThis plugin was created by Arcader2k");
+				return true;
+		  }
+		  else
+		  {
+			  sender.sendMessage("§4You must be in-game to execute this cmd!");
+			  return true;
+		  }
+	  }
 	  if(cmd.getName().equalsIgnoreCase("servers") && sender instanceof Player)
 	  {
 		  addItems();
 		  p.openInventory(inv);
 	  }
-	  
+	  if(cmd.getName().equalsIgnoreCase("setspawn"))
+	  {
+		  Location loc = new Location(Bukkit.getWorld(getConfig().getString("Spawn.World")),
+				  getConfig().getDouble("Spawn.X"), 
+				  getConfig().getDouble("Spawn.Y"), getConfig().getDouble("Spawn.Z"));
+		  getServer().getWorld(getConfig().getString("Spawn.World")).setSpawnLocation(loc);
+		  
+		  getConfig().set("Spawn.World", p.getWorld().getName());
+		  getConfig().set("Spawn.X", p.getLocation().getX());
+		  getConfig().set("Spawn.Y", p.getLocation().getY());
+		  getConfig().set("Spawn.Z", p.getLocation().getZ());
+		  getConfig().set("Spawn.Yaw", p.getLocation().getYaw());
+		  getConfig().set("Spawn.Pitch", p.getLocation().getPitch());
+		  saveConfig();
+		  
+		  p.sendMessage(getConfig().getString("Prefix").replace('&', '§') + " Spawn Set!");
+		  return true;
+		  
+	  }
+	  if(cmd.getName().equalsIgnoreCase("spawn"))
+	  {
+		  p.sendMessage(getConfig().getString("Prefix").replace('&', '§') + " Teleporting in 3 seconds..");
+		  count = 3;
+		  BukkitScheduler task = getServer().getScheduler();
+		  task.scheduleSyncRepeatingTask(this, new Runnable()
+		  {
+			  @Override
+			  public void run()
+			  {
+				  if(count >0)
+				  {
+					  count--;
+				  }
+				  Location loc = new Location(Bukkit.getWorld(getConfig().getString("Spawn.World")),
+						  getConfig().getDouble("Spawn.X"), 
+						  getConfig().getDouble("Spawn.Y"), getConfig().getDouble("Spawn.Z"), 
+						  (float) getConfig().getDouble("Spawn.Yaw"), 
+						  (float) getConfig().getDouble("Spawn.Pitch"));
+				  p.teleport(loc);
+			  }
+		  }, 10, 20);
+		  getServer().getScheduler().cancelTasks(this);
+	  }
 	  if (cmd.getName().equalsIgnoreCase("agtest"))
 	  {
 	    if ((sender instanceof Player))
@@ -114,8 +150,8 @@ public class Main
      }
     return false;
   }
-  
-  public void addItems()
+
+public void addItems()
   {
 	  ItemStack bench = new ItemStack (Material.WORKBENCH);
 	  ItemMeta benchMeta = bench.getItemMeta();
@@ -158,32 +194,32 @@ public class Main
 	  }
 	  switch (e.getSlot())
 	  {
-	    case 7:
+	    case 1:
 	   		p.closeInventory();
-	   		p.sendMessage("§3Connecting to " + getConfig().getString("Server1") + "...");
-	   		teleportToServer(p, getConfig().getString("Server1"));
-	   		break;
-	   	case 1:
-	   		p.closeInventory();
-	   		p.sendMessage("§3Connecting to " + getConfig().getString("Server2") + "...");
-	   		teleportToServer(p, getConfig().getString("Server2"));
-	   		break;
-	   	case 5:
-	   		p.closeInventory();
-	   		p.sendMessage("§3Connecting to " + getConfig().getString("Server3") + "...");
-	   		teleportToServer(p, getConfig().getString("Server3"));
+	   		p.sendMessage("§3Connecting to " + getConfig().getString("Servers.1") + "...");
+	   		teleportToServer(p, getConfig().getString("Servers.1"));
 	   		break;
 	   	case 3:
 	   		p.closeInventory();
-	   		p.sendMessage("§3Connecting to " + getConfig().getString("Server4") + "...");
-	   		teleportToServer(p, getConfig().getString("Server4"));
+	   		p.sendMessage("§3Connecting to " + getConfig().getString("Servers.2") + "...");
+	   		teleportToServer(p, getConfig().getString("Servers.2"));
+	   		break;
+	   	case 5:
+	   		p.closeInventory();
+	   		p.sendMessage("§3Connecting to " + getConfig().getString("Servers.3") + "...");
+	   		teleportToServer(p, getConfig().getString("Servers.3"));
+	   		break;
+	   	case 7:
+	   		p.closeInventory();
+	   		p.sendMessage("§3Connecting to " + getConfig().getString("Servers.4") + "...");
+	   		teleportToServer(p, getConfig().getString("Servers.4"));
 	  		break;
 	   	default:
 	   		e.setCancelled(true);
 	   		break;
 	  }
     }
-	public void teleportToServer(Player player, String server)
+  public void teleportToServer(Player player, String server)
 	{
 		ByteArrayOutputStream b = new ByteArrayOutputStream();
 		DataOutputStream out = new DataOutputStream(b);
@@ -198,8 +234,8 @@ public class Main
 		}
 		player.sendPluginMessage(this, "BungeeCord", b.toByteArray());
 	}
-	@SuppressWarnings({ "deprecation"})
-	private void checkSlots(Inventory inv)
+  @SuppressWarnings({ "deprecation"})
+  private void checkSlots(Inventory inv)
 	{
 	    ItemStack space;
 	    space = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.WHITE.getDyeData());
@@ -214,4 +250,50 @@ public class Main
 	        }
 	    }
 	}
+  public void loadConfig()
+  {
+	  plugin = getDataFolder();
+	  configFile = new File(plugin, "Config.yml");
+	    
+	  config = new YamlConfiguration();
+	  if (!plugin.exists()) 
+	  {
+	    plugin.mkdir();
+	  }
+	  if (!configFile.exists()) 
+	  {
+	    try
+	    {
+	  	  getLogger().info("Config.yml not found, creating!");
+	   	  configFile.createNewFile();
+	   	  saveDefaultConfig();
+	    }
+	    catch (IOException e) 
+	    {
+	   	  e.printStackTrace();
+	    }
+	  }
+	  String world = "Spawn.World";
+	  String X = "Spawn.X";
+	  String Y = "Spawn.Y";
+	  String Z = "Spawn.Z";
+	  String prefix = "Prefix";
+	  String server1 = "Servers.1";
+	  String server2 = "Servers.2";
+	  String server3 = "Servers.3";
+	  String server4 = "Servers.4";
+	  getConfig().addDefault(prefix, "[ AGCore ]");
+	  
+	  getConfig().addDefault(server1, "1stServerName");
+	  getConfig().addDefault(server2, "2ndServerName");
+	  getConfig().addDefault(server3, "3rdServerName");
+	  getConfig().addDefault(server4, "4thServerName");
+	  
+	  getConfig().addDefault(world, "world");
+	  getConfig().addDefault(X, "100");
+	  getConfig().addDefault(Y, "100");
+	  getConfig().addDefault(Z, "100");
+	  getConfig().options().copyDefaults(true);
+	  saveConfig();
+  }
 }

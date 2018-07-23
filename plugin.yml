@@ -1,5 +1,5 @@
 name: AGCore
-version: 1.6.2
+version: 1.6.5
 main: Core.Main
 description: AGCore
 
@@ -11,4 +11,8 @@ commands:
     agcore:
         description: ...
     check:
-        description:  Checks players personal Stats.    
+        description:  Checks players personal Stats.
+    setspawn:
+        description: Sets the players current location to the Config
+    spawn:
+        description: Teleports the player to the set location    
