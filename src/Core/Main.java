@@ -327,10 +327,10 @@ public class Main
 	  String server4 = "Servers.4";
 	  getConfig().addDefault(prefix, "[AGCore]");
 	  
-	  getConfig().addDefault(server1, "1stServerName");
-	  getConfig().addDefault(server2, "2ndServerName");
-	  getConfig().addDefault(server3, "3rdServerName");
-	  getConfig().addDefault(server4, "4thServerName");
+	  getConfig().addDefault(server1, "Factions");
+	  getConfig().addDefault(server2, "Skyblock");
+	  getConfig().addDefault(server3, "KitPVP");
+	  getConfig().addDefault(server4, "Hub");
 	  
 	  getConfig().addDefault(world, "world");
 	  getConfig().addDefault(X, "0");
