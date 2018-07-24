@@ -25,6 +25,7 @@ public class VoidSpawn
     	  e.setCancelled(true);
     	  p.sendMessage("§3Teleporting...");
           reSpawn((Player) p);
+          p.setFallDistance(0);
           return;
       }
     }
