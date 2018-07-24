@@ -52,7 +52,6 @@ public class Main
     getCommand("agtest").setExecutor(this);
     getCommand("servers").setExecutor(this);
     getCommand("check").setExecutor(new Check());
-    getCommand("agcore").setExecutor(this);
     
     Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
     
@@ -84,7 +83,11 @@ public class Main
 			  addItems();
 			  p.openInventory(inv);
 		  }
-		  sender.sendMessage("§cYou are misssing the 'core.servers' permission.");
+		  else
+		  {
+			  sender.sendMessage("§cYou are misssing the 'core.servers' permission.");
+			  return true;
+		  }
 	  }
 	  if(cmd.getName().equalsIgnoreCase("setspawn"))
 	  {
@@ -151,7 +154,7 @@ public class Main
 	  }
 	  if (cmd.getName().equalsIgnoreCase("agtest"))
 	  {
-	    if ((sender instanceof Player))
+	    if ((sender.hasPermission("core.test")))
 	    {
 	    	sender.sendMessage("§b----------- [ §aAGCore §b]-----------");
 		    sender.sendMessage("§2Active: §a§l" +
@@ -162,6 +165,11 @@ public class Main
 		    sender.sendMessage("§2Author: §aArcader2k");
 		    sender.sendMessage("§b-------------------------------");
 		    return true;
+	    }
+	    else
+	    {
+	    	sender.sendMessage("§cYou are missing the 'core.test' permission.");
+			return true;
 	    }
      }
     return false;

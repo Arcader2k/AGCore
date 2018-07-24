@@ -1,5 +1,5 @@
 name: AGCore
-version: 1.6.5
+version: 1.9.8
 main: Core.Main
 description: AGCore
 
@@ -8,8 +8,6 @@ commands:
         description: Is AGCore active?
     servers:
         description: Opens server list menu
-    agcore:
-        description: ...
     check:
         description:  Checks players personal Stats.
     setspawn:
