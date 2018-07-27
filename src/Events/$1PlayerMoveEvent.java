@@ -9,11 +9,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
+import Core.Main;
+
 public class $1PlayerMoveEvent
   implements Listener
 {
   @SuppressWarnings("deprecation")
-@EventHandler
+  @EventHandler
   public void onLaunchMove(PlayerMoveEvent event)
   {
     Player player = event.getPlayer();
@@ -26,5 +28,20 @@ public class $1PlayerMoveEvent
       player.playEffect(player.getLocation(), Effect.EXPLOSION_HUGE, 1);
       player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_IMPACT, 1.0F, 1.0F);
     }
+  }
+  
+  @EventHandler
+  public void onMove(PlayerMoveEvent e)
+  {
+	  if(Main.getInstance().hm.containsKey(e.getPlayer().getName()))
+	  {
+		  if(e.getFrom().getBlockX() != e.getTo().getBlockX())
+		  {
+			  Main.getInstance().stopTimer();
+			  Main.getInstance().hm.remove(e.getPlayer().getName());
+			  e.getPlayer().sendMessage("§cYou moved! Teleportation cancelled.");
+			  return;
+		  }
+	  }
   }
 }
