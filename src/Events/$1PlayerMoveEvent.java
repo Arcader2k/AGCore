@@ -9,8 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
-import Core.Main;
-
 public class $1PlayerMoveEvent
   implements Listener
 {
