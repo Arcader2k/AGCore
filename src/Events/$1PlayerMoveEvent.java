@@ -29,19 +29,4 @@ public class $1PlayerMoveEvent
       player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_IMPACT, 1.0F, 1.0F);
     }
   }
-  
-  @EventHandler
-  public void onMove(PlayerMoveEvent e)
-  {
-	  if(Main.getInstance().hm.containsKey(e.getPlayer().getName()))
-	  {
-		  if(e.getFrom().getBlockX() != e.getTo().getBlockX())
-		  {
-			  Main.getInstance().stopTimer();
-			  Main.getInstance().hm.remove(e.getPlayer().getName());
-			  e.getPlayer().sendMessage("§cYou moved! Teleportation cancelled.");
-			  return;
-		  }
-	  }
-  }
 }
