@@ -9,6 +9,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
+import Core.Main;
+
 public class $1PlayerMoveEvent
   implements Listener
 {
@@ -18,13 +20,17 @@ public class $1PlayerMoveEvent
   {
     Player player = event.getPlayer();
     Location playerLoc = player.getLocation();
-	int ID = playerLoc.getWorld().getBlockAt(playerLoc).getRelative(0, -1, 0).getTypeId();
-    if (ID == 165)
+    int ID = playerLoc.getWorld().getBlockAt(playerLoc).getRelative(0, -1, 0).getTypeId();
+    
+    if(player.getWorld().getName() == Main.getInstance().getConfig().getString("LaunchPad.Enabled.World"))
     {
-      player.setVelocity(player.getLocation().getDirection().multiply(5));
-      player.setVelocity(new Vector(player.getVelocity().getX(), 1.0D, player.getVelocity().getZ()));
-      player.playEffect(player.getLocation(), Effect.EXPLOSION_HUGE, 1);
-      player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_IMPACT, 1.0F, 1.0F);
+    	if (ID == 165)
+        {
+          player.setVelocity(player.getLocation().getDirection().multiply(Main.getInstance().getConfig().getDouble("LaunchPad.Velocity")));
+          player.setVelocity(new Vector(player.getVelocity().getX(), 1.0D, player.getVelocity().getZ()));
+          player.playEffect(player.getLocation(), Effect.EXPLOSION_HUGE, 1);
+          player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_IMPACT, 1.0F, 1.0F);
+        }
     }
   }
 }

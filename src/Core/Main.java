@@ -47,7 +47,7 @@ public class Main
 	private int count;
 	private int taskID;
 	
-	Inventory inv = Bukkit.createInventory(null, 9, ChatColor.RED + "Menu" );
+	Inventory inv = Bukkit.createInventory(null, 9, ChatColor.RED + getConfig().getString("Menu-Name"));
 	public HashMap<String, Integer> hm= new HashMap<>();
 	
   public void onEnable()
@@ -60,6 +60,8 @@ public class Main
     getCommand("agtest").setExecutor(this);
     getCommand("servers").setExecutor(this);
     getCommand("check").setExecutor(new Check());
+    getCommand("lp").setExecutor(this);
+    getCommand("core").setExecutor(this);
     
     Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
     
@@ -80,8 +82,7 @@ public class Main
     loadConfig();
     
   }
-  
-  public boolean onCommand(CommandSender sender, Command cmd, String label, String[] arg)
+public boolean onCommand(CommandSender sender, Command cmd, String label, String[] arg)
   {
 	  Player p = (Player) sender;
 	  if (cmd.getName().equalsIgnoreCase("agtest"))
@@ -101,6 +102,7 @@ public class Main
 	    else
 	    {
 	    	sender.sendMessage("§cYou are missing the 'core.test' permission.");
+	    	sender.sendMessage("§cPlease contact support.");
 			return true;
 	    }
      }
@@ -108,23 +110,24 @@ public class Main
 		{
 		  if(sender.hasPermission("core.servers"))
 	      {
-		     addItems();
+		      addItems();
 			  p.openInventory(inv);
 			}
 			else
 			{
 			 sender.sendMessage("§cYou are misssing the 'core.servers' permission.");
+			 sender.sendMessage("§cPlease contact support.");
 			 return true;
 			}
 		 }
 	  
 	  if(cmd.getName().equalsIgnoreCase("spawn"))
 	  {
-		  if(!Main.getInstance().hm.containsKey(p.getName()))
+		  if(!hm.containsKey(p.getName()))
 		  {
 			  if(sender.hasPermission("core.spawn"))
 			  {
-				  Main.getInstance().hm.put(p.getName(), 0);
+				  this.hm.put(p.getName(), 0);
 				  p.sendMessage(Main.getInstance().getConfig().getString("Prefix").replace('&', '§') + "§cTeleporting in "+"§c§l3" + " §cseconds..");
 				  BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 				  taskID = scheduler.scheduleSyncRepeatingTask((Plugin) this, new Runnable()
@@ -141,7 +144,7 @@ public class Main
 									  (float) Main.getInstance().getConfig().getDouble("Spawn.Yaw"), 
 									  (float) Main.getInstance().getConfig().getDouble("Spawn.Pitch"));
 							  p.teleport(loc);
-							  Main.getInstance().hm.remove(p.getName());
+							  hm.remove(p.getName());
 							  stopTimer();
 							  return;
 						  }
@@ -151,22 +154,77 @@ public class Main
 			  else
 			  {
 				  sender.sendMessage("§cYou are missing the 'core.spawn' permission.");
+				  sender.sendMessage("§cPlease contact support.");
 				  return true;
 			  }
 		  }
 	  }
-    return false;
+	  if(cmd.getName().equalsIgnoreCase("lp"))
+	  {
+		  
+		  if(arg.length == 1)
+		  {
+			  if(arg[0].equalsIgnoreCase("enable"))
+			  {
+				  if(sender.hasPermission("core.pads.enable"))
+				  {
+					  String world = p.getWorld().getName();
+					  
+					  getConfig().set("LaunchPad.Enabled.World", world);
+					  saveConfig();
+					  sender.sendMessage("§c§lLaunchpads >> §a§lEnabled!");
+				  }
+				  sender.sendMessage("§cYou are missing the 'core.pads.enable' permission.");
+				  sender.sendMessage("§cPlease contact support.");
+				  return true;
+				  
+			  }
+			  if(arg[0].equalsIgnoreCase("disable"))
+			  {
+				  if(sender.hasPermission("core.pads.disable"))
+				  {
+					  getConfig().set("LaunchPad.Enabled.World", "");
+					  saveConfig();
+					  sender.sendMessage("§c§lLaunchpads >> §4§lDisabled!");
+				  }
+				  sender.sendMessage("§cYou are missing the 'core.pads.disable' permission.");
+				  sender.sendMessage("§cPlease contact support.");
+				  return true;
+				  
+			  }
+		  }
+		  sender.sendMessage("§cUsage: <enable/disable>");
+		  return true;
+	  }
+	  if(cmd.getName().equalsIgnoreCase("core"))
+	  {
+		  if(arg.length == 1)
+		  {
+			  if(arg[0].equalsIgnoreCase("reload"))
+			  {
+				  if(sender.hasPermission("core.reload"))
+				  {
+					  instance.reloadConfig();
+					  sender.sendMessage("§aComplete");
+				  }
+				  sender.sendMessage("§cYou are missing the 'core.reload' permission.");
+				  sender.sendMessage("§cPlease contact support.");
+				  return true;
+			  }
+		  }
+	  }
+	  return true;
   }
   
   @EventHandler
   public void onMove(PlayerMoveEvent e)
   {
-	if(Main.getInstance().hm.containsKey(e.getPlayer().getName()))
+	if(this.hm.containsKey(e.getPlayer().getName()))
 	{
 	  if(e.getFrom().getBlockX() != e.getTo().getBlockX())
 	  {
 		  stopTimer();
-		  Main.getInstance().hm.remove(e.getPlayer().getName());
+		  this.hm.remove(e.getPlayer().getName());
 		  e.getPlayer().sendMessage("§cYou moved! Teleportation cancelled.");
 		  return;
 	  }
@@ -208,7 +266,10 @@ public class Main
 	  String server2 = "Servers.2";
 	  String server3 = "Servers.3";
 	  String server4 = "Servers.4";
+	  
+	  double v = 2;
 	  getConfig().addDefault(prefix, "[AGCore]");
+	  getConfig().addDefault("Menu-Name", "Servers");
 	  
 	  getConfig().addDefault(server1, "Factions");
 	  getConfig().addDefault(server2, "Skyblock");
@@ -219,6 +280,10 @@ public class Main
 	  getConfig().addDefault(X, "0");
 	  getConfig().addDefault(Y, "0");
 	  getConfig().addDefault(Z, "0");
+	  
+	  getConfig().addDefault("LaunchPad.Velocity", v);
+	  getConfig().addDefault("LaunchPad.Enabled.World", "world");
+	  
 	  getConfig().options().copyDefaults(true);
 	  saveConfig();
   }
@@ -263,40 +328,44 @@ public class Main
   {
 	  Player p = (Player) e.getWhoClicked();
 	  
-	  if(!ChatColor.stripColor(e.getInventory().getName()).equals("Menu")) 
-			 return;
-	  
-	  if(e.getCurrentItem()==null || e.getCurrentItem().getType()==Material.AIR||!e.getCurrentItem().hasItemMeta())
+	  if(!ChatColor.stripColor(e.getInventory().getName()).equals(getConfig().getString("Menu-Name")))
 	  {
 		  return;
 	  }
-	  switch (e.getSlot())
+	  else
 	  {
-	    case 1:
-	   		p.closeInventory();
-	   		p.sendMessage("§3Connecting to " + Main.getInstance().getConfig().getString("Servers.1") + "...");
-	   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.1"));
-	   		break;
-	   	case 3:
-	   		p.closeInventory();
-	   		p.sendMessage("§3Connecting to " + Main.getInstance().getConfig().getString("Servers.2") + "...");
-	   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.2"));
-	   		break;
-	   	case 5:
-	   		p.closeInventory();
-	   		p.sendMessage("§3Connecting to " + Main.getInstance().getConfig().getString("Servers.3") + "...");
-	   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.3"));
-	   		break;
-	   	case 7:
-	   		p.closeInventory();
-	   		p.sendMessage("§3Connecting to " + Main.getInstance().getConfig().getString("Servers.4") + "...");
-	   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.4"));
-	  		break;
-	   	default:
-	   		e.setCancelled(true);
-	   		break;
+		  if(e.getCurrentItem()==null || e.getCurrentItem().getType()==Material.AIR||!e.getCurrentItem().hasItemMeta())
+		  {
+			  return;
+		  }
+		  switch (e.getSlot())
+		  {
+		    case 1:
+		   		p.closeInventory();
+		   		p.sendMessage("§3Connecting to " + Main.getInstance().getConfig().getString("Servers.1") + "...");
+		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.1"));
+		   		break;
+		   	case 3:
+		   		p.closeInventory();
+		   		p.sendMessage("§3Connecting to " + Main.getInstance().getConfig().getString("Servers.2") + "...");
+		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.2"));
+		   		break;
+		   	case 5:
+		   		p.closeInventory();
+		   		p.sendMessage("§3Connecting to " + Main.getInstance().getConfig().getString("Servers.3") + "...");
+		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.3"));
+		   		break;
+		   	case 7:
+		   		p.closeInventory();
+		   		p.sendMessage("§3Connecting to " + Main.getInstance().getConfig().getString("Servers.4") + "...");
+		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.4"));
+		  		break;
+		   	default:
+		   		e.setCancelled(true);
+		   		break;
+		  }
+	    }
 	  }
-    }
   public void teleportToServer(Player player, String server)
 	{
 		ByteArrayOutputStream b = new ByteArrayOutputStream();

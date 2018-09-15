@@ -33,12 +33,13 @@ public class SetSpawn implements CommandExecutor
 				  Main.getInstance().getConfig().set("Spawn.Pitch", p.getLocation().getPitch());
 				  Main.getInstance().saveConfig();
 				  
-				  p.sendMessage(Main.getInstance().getConfig().getString("Prefix").replace('&', '§') + "§aSpawn Set!");
+				  p.sendMessage(Main.getInstance().getConfig().getString("Prefix ").replace('&', '§') + "§aSpawn Set!");
 				  return true;
 			  }
 			  else
 			  {
 				  sender.sendMessage("§cYou are missing the 'core.setspawn' permission.");
+				  sender.sendMessage("§cPlease contact support.");
 				  return true;
 			  }  
 		  }

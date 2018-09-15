@@ -1,5 +1,5 @@
 name: AGCore
-version: 2.0
+version: 4.3.5
 main: Core.Main
 description: AGCore
 
@@ -14,3 +14,7 @@ commands:
         description: Sets the players current location to the Config
     spawn:
         description: Teleports the player to the set location    
+    lp:
+        description: ...
+    core:
+        description: ...
