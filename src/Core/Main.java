@@ -44,7 +44,6 @@ public class Main
 	public static File plugin;
 	public static File configFile;
 	public FileConfiguration config;
-	private SetSpawn sspawn;
 	
 	private int count;
 	private int taskID;
@@ -56,33 +55,34 @@ public class Main
   public void onEnable()
   {
 	instance = this;
-	this.sspawn = new SetSpawn();
 	
-	getCommand("setspawn").setExecutor(this.sspawn);
-	getCommand("spawn").setExecutor(this);
-    getCommand("servers").setExecutor(this);
-    getCommand("check").setExecutor(new Check());
-    getCommand("lp").setExecutor(this);
-    getCommand("core").setExecutor(this);
+	
+	this.getCommand("setspawn").setExecutor(new SetSpawn());
+	this.getCommand("spawn").setExecutor(this);
+	this.getCommand("servers").setExecutor(this);
+	this.getCommand("check").setExecutor(new Check());
+	this.getCommand("lp").setExecutor(this);
+	this.getCommand("core").setExecutor(this);
     
     Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
     
-    getServer().getPluginManager().registerEvents(this, this);
-    getServer().getPluginManager().registerEvents(new VoidSpawn(), this);
-    getServer().getPluginManager().registerEvents(new $1PlayerMoveEvent(), this);
-    getServer().getPluginManager().registerEvents(new WorldChangeEvent(), this);
+    this.getServer().getPluginManager().registerEvents(this, this);
+    this.getServer().getPluginManager().registerEvents(new VoidSpawn(), this);
+    this.getServer().getPluginManager().registerEvents(new $1PlayerMoveEvent(), this);
+    this.getServer().getPluginManager().registerEvents(new WorldChangeEvent(), this);
     
     ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
 
-    console.sendMessage("§b------------------------------------------");
-    console.sendMessage("§3Core");
-    console.sendMessage("§3Author: Arcader2k");
-    console.sendMessage("§3Version: " +  getServer().getPluginManager().getPlugin("AGCore")
-            .getDescription().getVersion());
-    console.sendMessage("§b------------------------------------------");
-    
-    loadConfig();
-    
+    console.sendMessage("§b----------- [ §aAGCore §b]-----------");
+    console.sendMessage("§2Active: §a§l" +
+    		this.getServer().getPluginManager().isPluginEnabled("AGCore"));
+    console.sendMessage("§2Version: §a§l" + 
+    		this.getServer().getPluginManager().getPlugin("AGCore")
+        .getDescription().getVersion());
+    console.sendMessage("");
+    console.sendMessage("§2Author: §aArcader2k");
+    console.sendMessage("§b----------------------------------------");
+    this.loadConfig();
   }
   public boolean onCommand(CommandSender sender, Command cmd, String label, String[] arg)
   {
@@ -92,7 +92,7 @@ public class Main
 		{
 		  if(sender.hasPermission("core.servers") || sender.hasPermission("core.*"))
 	      {
-		      addItems();
+			  this.addItems();
 			  p.openInventory(inv);
 			}
 			else
@@ -102,7 +102,6 @@ public class Main
 			 return true;
 			}
 		 }
-	  
 	  if(cmd.getName().equalsIgnoreCase("spawn"))
 	  {
 		  if(!hm.containsKey(p.getName()))
@@ -143,22 +142,21 @@ public class Main
 	  }
 	  if(cmd.getName().equalsIgnoreCase("lp"))
 	  {
-		  
 		  if(arg.length == 1)
 		  {
 			  if(arg[0].equalsIgnoreCase("enable"))
 			  {
 				  if(sender.hasPermission("core.pads.enable"))
 				  {
-					  if(getConfig().getStringList("Launchpad.Enabled.Worlds").contains(WORLD))
+					  if(this.getConfig().getStringList("Launchpad.Enabled.Worlds").contains(WORLD))
 					  {
 						  sender.sendMessage("§c§lLaunchpad >> §aWorld is already enabled!");
 						  return true;
 					  }
-					  List<String> worlds = getConfig().getStringList("Launchpad.Enabled.Worlds");
+					  List<String> worlds = this.getConfig().getStringList("Launchpad.Enabled.Worlds");
 					  worlds.add(WORLD);
-					  getConfig().set("Launchpad.Enabled.Worlds", worlds);
-					  saveConfig();
+					  this.getConfig().set("Launchpad.Enabled.Worlds", worlds);
+					  this.saveConfig();
 					  sender.sendMessage("§c§lLaunchpad >> §a§lEnabled!");
 					  return true;
 				  }
@@ -171,15 +169,15 @@ public class Main
 			  {
 				  if(sender.hasPermission("core.pads.disable"))
 				  {
-					  if(!getConfig().getStringList("Launchpad.Enabled.Worlds").contains(WORLD))
+					  if(!this.getConfig().getStringList("Launchpad.Enabled.Worlds").contains(WORLD))
 					  {
 						  sender.sendMessage("§c§lLaunchpad >> §4World has already been disabled!");
 						  return true;
 					  }
-					  List<String> worlds = getConfig().getStringList("Launchpad.Enabled.Worlds");
+					  List<String> worlds = this.getConfig().getStringList("Launchpad.Enabled.Worlds");
 					  worlds.remove(WORLD);
-					  getConfig().set("Launchpad.Enabled.Worlds", worlds);
-					  saveConfig();
+					  this.getConfig().set("Launchpad.Enabled.Worlds", worlds);
+					  this.saveConfig();
 					  sender.sendMessage("§c§lLaunchpad >> §4§lDisabled!");
 					  return true;
 				  }
@@ -226,9 +224,9 @@ public class Main
 				    {
 				    	sender.sendMessage("§b----------- [ §aAGCore §b]-----------");
 					    sender.sendMessage("§2Active: §a§l" +
-					     		getServer().getPluginManager().isPluginEnabled("AGCore"));
+					    		this.getServer().getPluginManager().isPluginEnabled("AGCore"));
 					    sender.sendMessage("§2Version: §a§l" + 
-					      		getServer().getPluginManager().getPlugin("AGCore")
+					    		this.getServer().getPluginManager().getPlugin("AGCore")
 					        .getDescription().getVersion());
 					    sender.sendMessage("");
 					    sender.sendMessage("§2Author: §aArcader2k");
@@ -242,7 +240,7 @@ public class Main
 						return true;
 				    }
 			  }
-		  }
+		  }  
 	  }
 	  return true;
   }
@@ -254,13 +252,13 @@ public class Main
 	{
 	  if(e.getFrom().getBlockX() != e.getTo().getBlockX())
 	  {
-		  stopTimer();
+		  this.stopTimer();
 		  this.hm.remove(e.getPlayer().getName());
 		  e.getPlayer().sendMessage("§cYou moved! Teleportation cancelled.");
 		  return;
 	  }
-	 }
 	}
+  }
   public void stopTimer()
   {
 	Bukkit.getScheduler().cancelTask(taskID);
@@ -283,9 +281,9 @@ public class Main
 	  {
 	    try
 	    {
-	  	  getLogger().info("Config.yml not found, creating!");
+	    	this.getLogger().info("Config.yml not found, creating!");
 	   	  configFile.createNewFile();
-	   	  saveDefaultConfig();
+	   	this.saveDefaultConfig();
 	    }
 	    catch (IOException e) 
 	    {
@@ -306,32 +304,32 @@ public class Main
 	  String server5 = "Servers.Fifth";
 	  
 	  double v = 2;
-	  getConfig().addDefault(prefix, "[AGCore]");
-	  getConfig().addDefault("Menu-Name", "Servers");
+	  this.getConfig().addDefault(prefix, "[AGCore]");
+	  this.getConfig().addDefault("Menu-Name", "Servers");
 	  
-	  getConfig().addDefault(server1, "Factions");
-	  getConfig().addDefault(server2, "Skyblock");
-	  getConfig().addDefault(server3, "KitPVP");
-	  getConfig().addDefault(server4, "Hub");
-	  getConfig().addDefault(server5, "Pre-Pvp");
+	  this.getConfig().addDefault(server1, "Factions");
+	  this.getConfig().addDefault(server2, "Skyblock");
+	  this.getConfig().addDefault(server3, "KitPVP");
+	  this.getConfig().addDefault(server4, "Hub");
+	  this.getConfig().addDefault(server5, "Pre-Pvp");
 	  
-	  getConfig().addDefault(world, "world");
-	  getConfig().addDefault(X, "0");
-	  getConfig().addDefault(Y, "0");
-	  getConfig().addDefault(Z, "0");
-	  getConfig().addDefault(Yaw, "0");
-	  getConfig().addDefault(Pitch, "0");
+	  this.getConfig().addDefault(world, "world");
+	  this.getConfig().addDefault(X, "0");
+	  this.getConfig().addDefault(Y, "0");
+	  this.getConfig().addDefault(Z, "0");
+	  this.getConfig().addDefault(Yaw, "0");
+	  this.getConfig().addDefault(Pitch, "0");
 	  
-	  getConfig().addDefault("Launchpad.Velocity", v);
+	  this.getConfig().addDefault("Launchpad.Velocity", v);
 	  List<String> list = new ArrayList<String>();
 	  list.add("world");
 	  list.add("world_nether");
 	  list.add("world_the_end");
 
-	  getConfig().set("Launchpad.Enabled.Worlds", list);
+	  this.getConfig().set("Launchpad.Enabled.Worlds", list);
 	  
-	  getConfig().options().copyDefaults(true);
-	  saveConfig();
+	  this.getConfig().options().copyDefaults(true);
+	  this.saveConfig();
   }
   public void onDisable() 
   {}
@@ -408,7 +406,6 @@ public class Main
 	  
 	  checkSlots(inv);
   }
-  
   @EventHandler
   public void onInventoryClick(InventoryClickEvent e)
   {
@@ -458,20 +455,20 @@ public class Main
 	    }
 	  }
   public void teleportToServer(Player player, String server)
+  {
+	ByteArrayOutputStream b = new ByteArrayOutputStream();
+	DataOutputStream out = new DataOutputStream(b);
+	try 
 	{
-		ByteArrayOutputStream b = new ByteArrayOutputStream();
-		DataOutputStream out = new DataOutputStream(b);
-		try 
-		{
-		    out.writeUTF("Connect");
-		    out.writeUTF(server);
-		} 
-		catch (IOException e) 
-		{
-		    e.printStackTrace();
-		}
-		player.sendPluginMessage(Main.getInstance(), "BungeeCord", b.toByteArray());
+	    out.writeUTF("Connect");
+	    out.writeUTF(server);
+	} 
+	catch (IOException e) 
+	{
+	    e.printStackTrace();
 	}
+	player.sendPluginMessage(Main.getInstance(), "BungeeCord", b.toByteArray());
+  }
   @SuppressWarnings({ "deprecation"})
   private void checkSlots(Inventory inv)
 	{

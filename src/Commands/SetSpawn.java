@@ -33,7 +33,7 @@ public class SetSpawn implements CommandExecutor
 				  Main.getInstance().getConfig().set("Spawn.Pitch", p.getLocation().getPitch());
 				  Main.getInstance().saveConfig();
 				  
-				  p.sendMessage(Main.getInstance().getConfig().getString("Prefix ").replace('&', '§') + "§aSpawn Set!");
+				  sender.sendMessage(Main.getInstance().getConfig().getString("Prefix") + " §aSpawn Set!");
 				  return true;
 			  }
 			  else
