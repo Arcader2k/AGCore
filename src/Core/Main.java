@@ -4,7 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -46,6 +48,7 @@ public class Main
 	
 	private int count;
 	private int taskID;
+	private int reloadID;
 	
 	Inventory inv = Bukkit.createInventory(null, 9, ChatColor.RED + getConfig().getString("Menu-Name"));
 	public HashMap<String, Integer> hm= new HashMap<>();
@@ -57,7 +60,6 @@ public class Main
 	
 	getCommand("setspawn").setExecutor(this.sspawn);
 	getCommand("spawn").setExecutor(this);
-    getCommand("agtest").setExecutor(this);
     getCommand("servers").setExecutor(this);
     getCommand("check").setExecutor(new Check());
     getCommand("lp").setExecutor(this);
@@ -72,51 +74,31 @@ public class Main
     
     ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
 
-    console.sendMessage("§b------------------------------------------");
-    console.sendMessage("§3Core");
-    console.sendMessage("§3Author: Arcader2k");
-    console.sendMessage("§3Version: " +  getServer().getPluginManager().getPlugin("AGCore")
+    console.sendMessage("Â§b------------------------------------------");
+    console.sendMessage("Â§3Core");
+    console.sendMessage("Â§3Author: Arcader2k");
+    console.sendMessage("Â§3Version: " +  getServer().getPluginManager().getPlugin("AGCore")
             .getDescription().getVersion());
-    console.sendMessage("§b------------------------------------------");
+    console.sendMessage("Â§b------------------------------------------");
     
     loadConfig();
     
   }
-public boolean onCommand(CommandSender sender, Command cmd, String label, String[] arg)
+  public boolean onCommand(CommandSender sender, Command cmd, String label, String[] arg)
   {
 	  Player p = (Player) sender;
-	  if (cmd.getName().equalsIgnoreCase("agtest"))
-	  {
-	    if ((sender.hasPermission("core.test")))
-	    {
-	    	sender.sendMessage("§b----------- [ §aAGCore §b]-----------");
-		    sender.sendMessage("§2Active: §a§l" +
-		     		getServer().getPluginManager().isPluginEnabled("AGCore"));
-		    sender.sendMessage("§2Version: §a§l" + 
-		      		getServer().getPluginManager().getPlugin("AGCore")
-		        .getDescription().getVersion());
-		    sender.sendMessage("§2Author: §aArcader2k");
-		    sender.sendMessage("§b-------------------------------");
-		    return true;
-	    }
-	    else
-	    {
-	    	sender.sendMessage("§cYou are missing the 'core.test' permission.");
-	    	sender.sendMessage("§cPlease contact support.");
-			return true;
-	    }
-     }
+	  String WORLD = p.getWorld().getName();
 	  if(cmd.getName().equalsIgnoreCase("servers"))
 		{
-		  if(sender.hasPermission("core.servers"))
+		  if(sender.hasPermission("core.servers") || sender.hasPermission("core.*"))
 	      {
 		      addItems();
 			  p.openInventory(inv);
 			}
 			else
 			{
-			 sender.sendMessage("§cYou are misssing the 'core.servers' permission.");
-			 sender.sendMessage("§cPlease contact support.");
+			 sender.sendMessage("Â§cYou are misssing the 'core.servers' permission.");
+			 sender.sendMessage("Â§cPlease contact support.");
 			 return true;
 			}
 		 }
@@ -128,7 +110,7 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
 			  if(sender.hasPermission("core.spawn"))
 			  {
 				  this.hm.put(p.getName(), 0);
-				  p.sendMessage(Main.getInstance().getConfig().getString("Prefix").replace('&', '§') + "§cTeleporting in "+"§c§l3" + " §cseconds..");
+				  p.sendMessage(Main.getInstance().getConfig().getString("Prefix").replace('&', 'Â§') + "Â§cTeleporting in "+"Â§cÂ§l3" + " Â§cseconds..");
 				  BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 				  taskID = scheduler.scheduleSyncRepeatingTask((Plugin) this, new Runnable()
 				  {
@@ -137,12 +119,12 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
 					  {
 						  if(count == 0)
 						  {
-							  p.sendMessage("§3Teleporting...");
-							  Location loc = new Location(Bukkit.getWorld(Main.getInstance().getConfig().getString("Spawn.World")),
-									  Main.getInstance().getConfig().getDouble("Spawn.X"), 
-									  Main.getInstance().getConfig().getDouble("Spawn.Y"), Main.getInstance().getConfig().getDouble("Spawn.Z"), 
-									  (float) Main.getInstance().getConfig().getDouble("Spawn.Yaw"), 
-									  (float) Main.getInstance().getConfig().getDouble("Spawn.Pitch"));
+							  p.sendMessage("Â§3Teleporting...");
+							  Location loc = new Location(Bukkit.getWorld(Main.getInstance().getConfig().getString("Spawn.Location.World")),
+									  Main.getInstance().getConfig().getDouble("Spawn.Location.X"), 
+									  Main.getInstance().getConfig().getDouble("Spawn.Location.Y"), Main.getInstance().getConfig().getDouble("Spawn.Location.Z"), 
+									  (float) Main.getInstance().getConfig().getDouble("Spawn.Location.Yaw"), 
+									  (float) Main.getInstance().getConfig().getDouble("Spawn.Location.Pitch"));
 							  p.teleport(loc);
 							  hm.remove(p.getName());
 							  stopTimer();
@@ -153,8 +135,8 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
 			  }
 			  else
 			  {
-				  sender.sendMessage("§cYou are missing the 'core.spawn' permission.");
-				  sender.sendMessage("§cPlease contact support.");
+				  sender.sendMessage("Â§cYou are missing the 'core.spawn' permission.");
+				  sender.sendMessage("Â§cPlease contact support.");
 				  return true;
 			  }
 		  }
@@ -168,14 +150,20 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
 			  {
 				  if(sender.hasPermission("core.pads.enable"))
 				  {
-					  String world = p.getWorld().getName();
-					  
-					  getConfig().set("LaunchPad.Enabled.World", world);
+					  if(getConfig().getStringList("Launchpad.Enabled.Worlds").contains(WORLD))
+					  {
+						  sender.sendMessage("Â§cÂ§lLaunchpad >> Â§aWorld is already enabled!");
+						  return true;
+					  }
+					  List<String> worlds = getConfig().getStringList("Launchpad.Enabled.Worlds");
+					  worlds.add(WORLD);
+					  getConfig().set("Launchpad.Enabled.Worlds", worlds);
 					  saveConfig();
-					  sender.sendMessage("§c§lLaunchpads >> §a§lEnabled!");
+					  sender.sendMessage("Â§cÂ§lLaunchpad >> Â§aÂ§lEnabled!");
+					  return true;
 				  }
-				  sender.sendMessage("§cYou are missing the 'core.pads.enable' permission.");
-				  sender.sendMessage("§cPlease contact support.");
+				  sender.sendMessage("Â§cYou are missing the 'core.pads.enable' permission.");
+				  sender.sendMessage("Â§cPlease contact support.");
 				  return true;
 				  
 			  }
@@ -183,17 +171,24 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
 			  {
 				  if(sender.hasPermission("core.pads.disable"))
 				  {
-					  getConfig().set("LaunchPad.Enabled.World", "");
+					  if(!getConfig().getStringList("Launchpad.Enabled.Worlds").contains(WORLD))
+					  {
+						  sender.sendMessage("Â§cÂ§lLaunchpad >> Â§4World has already been disabled!");
+						  return true;
+					  }
+					  List<String> worlds = getConfig().getStringList("Launchpad.Enabled.Worlds");
+					  worlds.remove(WORLD);
+					  getConfig().set("Launchpad.Enabled.Worlds", worlds);
 					  saveConfig();
-					  sender.sendMessage("§c§lLaunchpads >> §4§lDisabled!");
+					  sender.sendMessage("Â§cÂ§lLaunchpad >> Â§4Â§lDisabled!");
+					  return true;
 				  }
-				  sender.sendMessage("§cYou are missing the 'core.pads.disable' permission.");
-				  sender.sendMessage("§cPlease contact support.");
+				  sender.sendMessage("Â§cYou are missing the 'core.pads.disable' permission.");
+				  sender.sendMessage("Â§cPlease contact support.");
 				  return true;
-				  
 			  }
 		  }
-		  sender.sendMessage("§cUsage: <enable/disable>");
+		  sender.sendMessage("Â§cUsage: <enable/disable>");
 		  return true;
 	  }
 	  if(cmd.getName().equalsIgnoreCase("core"))
@@ -202,14 +197,50 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
 		  {
 			  if(arg[0].equalsIgnoreCase("reload"))
 			  {
-				  if(sender.hasPermission("core.reload"))
+				  if(sender.hasPermission("core.reload") && sender instanceof Player || sender.hasPermission("core.*"))
 				  {
-					  instance.reloadConfig();
-					  sender.sendMessage("§aComplete");
+					  sender.sendMessage(getConfig().getString("Prefix").replace('&', 'Â§') + (" Â§cReloading config.."));
+					  BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+					  reloadID = scheduler.scheduleSyncRepeatingTask((Plugin) this, new Runnable()
+					  {
+						@Override
+						  public void run()
+						  {
+							  if(count == 0)
+							  {
+								  instance.reloadConfig();
+								  sender.sendMessage("Â§aComplete");
+								  stopReload();
+							  }
+						  }
+					  }, 40L, 20L);
+					  return true; 
 				  }
-				  sender.sendMessage("§cYou are missing the 'core.reload' permission.");
-				  sender.sendMessage("§cPlease contact support.");
+				  sender.sendMessage("Â§cYou are missing the 'core.reload' permission.");
+				  sender.sendMessage("Â§cPlease contact support.");
 				  return true;
+			  }
+			  if(arg[0].equalsIgnoreCase("info"))
+			  {
+				  if ((sender.hasPermission("core.test")))
+				    {
+				    	sender.sendMessage("Â§b----------- [ Â§aAGCore Â§b]-----------");
+					    sender.sendMessage("Â§2Active: Â§aÂ§l" +
+					     		getServer().getPluginManager().isPluginEnabled("AGCore"));
+					    sender.sendMessage("Â§2Version: Â§aÂ§l" + 
+					      		getServer().getPluginManager().getPlugin("AGCore")
+					        .getDescription().getVersion());
+					    sender.sendMessage("");
+					    sender.sendMessage("Â§2Author: Â§aArcader2k");
+					    sender.sendMessage("Â§b----------------------------------------");
+					    return true;
+				    }
+				    else
+				    {
+				    	sender.sendMessage("Â§cYou are missing the 'core.test' permission.");
+				    	sender.sendMessage("Â§cPlease contact support.");
+						return true;
+				    }
 			  }
 		  }
 	  }
@@ -225,15 +256,19 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
 	  {
 		  stopTimer();
 		  this.hm.remove(e.getPlayer().getName());
-		  e.getPlayer().sendMessage("§cYou moved! Teleportation cancelled.");
+		  e.getPlayer().sendMessage("Â§cYou moved! Teleportation cancelled.");
 		  return;
 	  }
 	 }
 	}
-	public void stopTimer()
-	{
-		Bukkit.getScheduler().cancelTask(taskID);
-	}
+  public void stopTimer()
+  {
+	Bukkit.getScheduler().cancelTask(taskID);
+  }
+  public void stopReload()
+  {
+	Bukkit.getScheduler().cancelTask(reloadID);
+  }
   public void loadConfig()
   {
 	  plugin = getDataFolder();
@@ -257,15 +292,18 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
 	   	  e.printStackTrace();
 	    }
 	  }
-	  String world = "Spawn.World";
-	  String X = "Spawn.X";
-	  String Y = "Spawn.Y";
-	  String Z = "Spawn.Z";
+	  String world = "Spawn.Location.World";
+	  String X = "Spawn.Location.X";
+	  String Y = "Spawn.Location.Y";
+	  String Z = "Spawn.Location.Z";
+	  String Yaw = "Spawn.Location.Yaw";
+	  String Pitch = "Spawn.Location.Pitch";
 	  String prefix = "Prefix";
-	  String server1 = "Servers.1";
-	  String server2 = "Servers.2";
-	  String server3 = "Servers.3";
-	  String server4 = "Servers.4";
+	  String server1 = "Servers.First";
+	  String server2 = "Servers.Second";
+	  String server3 = "Servers.Third";
+	  String server4 = "Servers.Fourth";
+	  String server5 = "Servers.Fifth";
 	  
 	  double v = 2;
 	  getConfig().addDefault(prefix, "[AGCore]");
@@ -275,14 +313,22 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
 	  getConfig().addDefault(server2, "Skyblock");
 	  getConfig().addDefault(server3, "KitPVP");
 	  getConfig().addDefault(server4, "Hub");
+	  getConfig().addDefault(server5, "Pre-Pvp");
 	  
 	  getConfig().addDefault(world, "world");
 	  getConfig().addDefault(X, "0");
 	  getConfig().addDefault(Y, "0");
 	  getConfig().addDefault(Z, "0");
+	  getConfig().addDefault(Yaw, "0");
+	  getConfig().addDefault(Pitch, "0");
 	  
-	  getConfig().addDefault("LaunchPad.Velocity", v);
-	  getConfig().addDefault("LaunchPad.Enabled.World", "world");
+	  getConfig().addDefault("Launchpad.Velocity", v);
+	  List<String> list = new ArrayList<String>();
+	  list.add("world");
+	  list.add("world_nether");
+	  list.add("world_the_end");
+
+	  getConfig().set("Launchpad.Enabled.Worlds", list);
 	  
 	  getConfig().options().copyDefaults(true);
 	  saveConfig();
@@ -298,27 +344,67 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
   {
 	  ItemStack bench = new ItemStack (Material.WORKBENCH);
 	  ItemMeta benchMeta = bench.getItemMeta();
-	  benchMeta.setDisplayName("§bFactions");
+	  benchMeta.setDisplayName("Â§bFactions");
+	  ArrayList<String> lore1 = new ArrayList<String>();
+	  lore1.add("Â§5â™¦ Build your base to defend against the enemies!");
+	  lore1.add("");
+	  lore1.add("Â§5â™¦ Click here!");
+	  
+	  benchMeta.setLore(lore1);
 	  bench.setItemMeta(benchMeta);
-	  inv.setItem(1, bench);
+	  inv.setItem(0, bench);
 	  
 	  ItemStack bucket = new ItemStack (Material.BUCKET);
 	  ItemMeta bucketMeta = bucket.getItemMeta();
-	  bucketMeta.setDisplayName("§bSkyblock");
+	  bucketMeta.setDisplayName("Â§bSkyblock");
+	  ArrayList<String> lore2 = new ArrayList<String>();
+	  lore2.add("Â§5â™¦ Start on your own or with friends");
+	  lore2.add("Â§5 to build up your island and compete against others");
+	  lore2.add("Â§5 to have the biggest and baddest island!");
+	  lore2.add("");
+	  lore2.add("Â§5â™¦ Click here!");
+	  
+	  bucketMeta.setLore(lore2);
 	  bucket.setItemMeta(bucketMeta);
-	  inv.setItem(3, bucket);
+	  inv.setItem(2, bucket);
 	  
 	  ItemStack sword = new ItemStack (Material.DIAMOND_SWORD);
 	  ItemMeta swordMeta = sword.getItemMeta();
-	  swordMeta.setDisplayName("§bKitPVP");
+	  swordMeta.setDisplayName("Â§bKitPVP");
+	  ArrayList<String> lore3 = new ArrayList<String>();
+	  lore3.add("Â§5â™¦ Ready to battle head-to-head");
+	  lore3.add("Â§5 with other players?");
+	  lore3.add("");
+	  lore3.add("Â§5â™¦ Click here!");
+	  
+	  swordMeta.setLore(lore3);
 	  sword.setItemMeta(swordMeta);
-	  inv.setItem(5, sword);
+	  inv.setItem(4, sword);
 	  
 	  ItemStack star = new ItemStack (Material.NETHER_STAR);
 	  ItemMeta starMeta = star.getItemMeta();
-	  starMeta.setDisplayName("§bHub");
+	  starMeta.setDisplayName("Â§bHub");
+	  ArrayList<String> lore4 = new ArrayList<String>();
+	  lore4.add("Â§5â™¦ Going back to Hub?");
+	  lore4.add("");
+	  lore4.add("Â§5â™¦ Click here!");
+	  
+	  starMeta.setLore(lore4);
 	  star.setItemMeta(starMeta);
-	  inv.setItem(7, star);
+	  inv.setItem(6, star);
+	  
+	  ItemStack isword = new ItemStack (Material.IRON_SWORD);
+	  ItemMeta imeta = isword.getItemMeta();
+	  imeta.setDisplayName("Â§bPre-PVP");
+	  ArrayList<String> lore5 = new ArrayList<String>();
+	  lore5.add("Â§5â™¦ Need some training?");
+	  lore5.add("Â§5â™¦ Start your training today!");
+	  lore5.add("");
+	  lore5.add("Â§5â™¦ Click here!");
+	  
+	  imeta.setLore(lore5);
+	  isword.setItemMeta(imeta);
+	  inv.setItem(8, isword);
 	  
 	  checkSlots(inv);
   }
@@ -340,25 +426,30 @@ public boolean onCommand(CommandSender sender, Command cmd, String label, String
 		  }
 		  switch (e.getSlot())
 		  {
-		    case 1:
+		    case 0:
 		   		p.closeInventory();
-		   		p.sendMessage("§3Connecting to " + Main.getInstance().getConfig().getString("Servers.1") + "...");
-		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.1"));
+		   		p.sendMessage("Â§3Warping to " + Main.getInstance().getConfig().getString("Servers.First") + "...");
+		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.First"));
 		   		break;
-		   	case 3:
+		   	case 2:
 		   		p.closeInventory();
-		   		p.sendMessage("§3Connecting to " + Main.getInstance().getConfig().getString("Servers.2") + "...");
-		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.2"));
+		   		p.sendMessage("Â§3Warping to " + Main.getInstance().getConfig().getString("Servers.Second") + "...");
+		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.Second"));
 		   		break;
-		   	case 5:
+		   	case 4:
 		   		p.closeInventory();
-		   		p.sendMessage("§3Connecting to " + Main.getInstance().getConfig().getString("Servers.3") + "...");
-		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.3"));
+		   		p.sendMessage("Â§3Warping to " + Main.getInstance().getConfig().getString("Servers.Third") + "...");
+		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.Third"));
 		   		break;
-		   	case 7:
+		   	case 6:
 		   		p.closeInventory();
-		   		p.sendMessage("§3Connecting to " + Main.getInstance().getConfig().getString("Servers.4") + "...");
-		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.4"));
+		   		p.sendMessage("Â§3Warping to " + Main.getInstance().getConfig().getString("Servers.Fourth") + "...");
+		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.Fourth"));
+		  		break;
+		   	case 8:
+		   		p.closeInventory();
+		   		p.sendMessage("Â§3Warping to " + Main.getInstance().getConfig().getString("Servers.Fifth") + "...");
+		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.Fifth"));
 		  		break;
 		   	default:
 		   		e.setCancelled(true);

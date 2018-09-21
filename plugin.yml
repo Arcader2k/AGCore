@@ -1,11 +1,9 @@
 name: AGCore
-version: 4.4.1
+version: 4.4.2
 main: Core.Main
 description: AGCore
 
 commands:
-    agtest:
-        description: Is AGCore active?
     servers:
         description: Opens server list menu
     check:
@@ -15,6 +13,6 @@ commands:
     spawn:
         description: Teleports the player to the set location    
     lp:
-        description: ...
+        description: Usage >> /lp <enable/disable>
     core:
-        description: ...
+        description: Usage >> /core info
