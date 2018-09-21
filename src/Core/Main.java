@@ -344,7 +344,7 @@ public class Main
   {
 	  ItemStack bench = new ItemStack (Material.WORKBENCH);
 	  ItemMeta benchMeta = bench.getItemMeta();
-	  benchMeta.setDisplayName("§bFactions");
+	  benchMeta.setDisplayName("§b" + getConfig().getString("Server.First"));
 	  ArrayList<String> lore1 = new ArrayList<String>();
 	  lore1.add("§5♦ Build your base to defend against the enemies!");
 	  lore1.add("");
@@ -356,7 +356,7 @@ public class Main
 	  
 	  ItemStack bucket = new ItemStack (Material.BUCKET);
 	  ItemMeta bucketMeta = bucket.getItemMeta();
-	  bucketMeta.setDisplayName("§bSkyblock");
+	  bucketMeta.setDisplayName("§b" + getConfig().getString("Server.Second"));
 	  ArrayList<String> lore2 = new ArrayList<String>();
 	  lore2.add("§5♦ Start on your own or with friends");
 	  lore2.add("§5 to build up your island and compete against others");
@@ -370,7 +370,7 @@ public class Main
 	  
 	  ItemStack sword = new ItemStack (Material.DIAMOND_SWORD);
 	  ItemMeta swordMeta = sword.getItemMeta();
-	  swordMeta.setDisplayName("§bKitPVP");
+	  swordMeta.setDisplayName("§b" + getConfig().getString("Server.Third"));
 	  ArrayList<String> lore3 = new ArrayList<String>();
 	  lore3.add("§5♦ Ready to battle head-to-head");
 	  lore3.add("§5 with other players?");
@@ -383,7 +383,7 @@ public class Main
 	  
 	  ItemStack star = new ItemStack (Material.NETHER_STAR);
 	  ItemMeta starMeta = star.getItemMeta();
-	  starMeta.setDisplayName("§bHub");
+	  starMeta.setDisplayName("§b" + getConfig().getString("Server.Fourth"));
 	  ArrayList<String> lore4 = new ArrayList<String>();
 	  lore4.add("§5♦ Going back to Hub?");
 	  lore4.add("");
@@ -395,7 +395,7 @@ public class Main
 	  
 	  ItemStack isword = new ItemStack (Material.IRON_SWORD);
 	  ItemMeta imeta = isword.getItemMeta();
-	  imeta.setDisplayName("§bPre-PVP");
+	  imeta.setDisplayName("§b" + getConfig().getString("Server.Fifth"));
 	  ArrayList<String> lore5 = new ArrayList<String>();
 	  lore5.add("§5♦ Need some training?");
 	  lore5.add("§5♦ Start your training today!");
