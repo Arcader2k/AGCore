@@ -30,78 +30,292 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import Commands.Check;
 import Commands.SetSpawn;
 import Events.$1PlayerMoveEvent;
+import Events.DeathEvents;
 import Events.VoidSpawn;
 import Events.WorldChangeEvent;
 
 public class Main
-  extends JavaPlugin
-  implements Listener
-{
+  extends JavaPlugin implements Listener 
+  {
 	private static Main instance;
-	public static File plugin;
-	public static File configFile;
-	public FileConfiguration config;
+	public static FileConfiguration config;
+	public static FileConfiguration messages;
+	public File cFile;
+	public File dFile;
 	
 	private int count;
 	private int taskID;
 	private int reloadID;
 	
-	Inventory inv = Bukkit.createInventory(null, 9, ChatColor.RED + getConfig().getString("Menu-Name"));
+	Inventory inv = Bukkit.createInventory(null, 9, ChatColor.RED + getConfig().getString("Menu-name"));
 	public HashMap<String, Integer> hm= new HashMap<>();
 	
-  public void onEnable()
-  {
-	instance = this;
-	
-	
-	this.getCommand("setspawn").setExecutor(new SetSpawn());
-	this.getCommand("spawn").setExecutor(this);
-	this.getCommand("servers").setExecutor(this);
-	this.getCommand("check").setExecutor(new Check());
-	this.getCommand("lp").setExecutor(this);
-	this.getCommand("core").setExecutor(this);
+    public void onEnable()
+    {
+	  this.getCommand("setspawn").setExecutor(new SetSpawn());
+	  this.getCommand("spawn").setExecutor(this);
+	  this.getCommand("servers").setExecutor(this);
+	  this.getCommand("lp").setExecutor(this);
+	  this.getCommand("core").setExecutor(this);
+	  this.getCommand("disablefly").setExecutor(this);
+	  this.getCommand("enablefly").setExecutor(this);
     
-    Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+      Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
     
-    this.getServer().getPluginManager().registerEvents(this, this);
-    this.getServer().getPluginManager().registerEvents(new VoidSpawn(), this);
-    this.getServer().getPluginManager().registerEvents(new $1PlayerMoveEvent(), this);
-    this.getServer().getPluginManager().registerEvents(new WorldChangeEvent(), this);
+      this.getServer().getPluginManager().registerEvents(this, this);
+      this.getServer().getPluginManager().registerEvents(new VoidSpawn(), this);
+      this.getServer().getPluginManager().registerEvents(new $1PlayerMoveEvent(), this);
+      this.getServer().getPluginManager().registerEvents(new WorldChangeEvent(), this);
+      this.getServer().getPluginManager().registerEvents(new DeathEvents(), this);
     
-    ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
+      ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
 
-    console.sendMessage("§b----------- [ §aAGCore §b]-----------");
-    console.sendMessage("§2Active: §a§l" +
+      console.sendMessage("§b----------- [ §aAGCore §b]-----------");
+      console.sendMessage("§2Active: §a§l" +
     		this.getServer().getPluginManager().isPluginEnabled("AGCore"));
-    console.sendMessage("§2Version: §a§l" + 
+      console.sendMessage("§2Version: §a§l" + 
     		this.getServer().getPluginManager().getPlugin("AGCore")
         .getDescription().getVersion());
-    console.sendMessage("");
-    console.sendMessage("§2Author: §aArcader2k");
-    console.sendMessage("§b----------------------------------------");
-    this.loadConfig();
+      console.sendMessage("");
+      console.sendMessage("§2Author: §aArcader2k");
+      console.sendMessage("§b----------------------------------------");
+      setupConfig();
+      setupMessages();
   }
+  
+  public void setupConfig()
+  {
+	 if(!this.getDataFolder().exists())
+	 {
+		 this.getDataFolder().mkdir();
+	 }
+		
+	 cFile = new File(this.getDataFolder(), "config.yml");
+		
+	 if(!cFile.exists())
+	 {
+		 try
+		 {
+			 cFile.createNewFile();
+		 } catch(IOException e)
+		 {
+			 Bukkit.getServer().getConsoleSender()
+			 .sendMessage(ChatColor.RED + "Could not load config.yml");
+		 }	
+	 }
+	 config = YamlConfiguration.loadConfiguration(cFile);
+	 Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.GOLD + "config.yml has been loaded!");
+		
+	 String world = "Spawn.Location.World";
+	 String X = "Spawn.Location.X";
+	 String Y = "Spawn.Location.Y";
+	 String Z = "Spawn.Location.Z";
+	 String Yaw = "Spawn.Location.Yaw";
+	 String Pitch = "Spawn.Location.Pitch";
+	 String prefix = "Prefix";
+	 String Menu = "Menu-name";
+	 String server1 = "Servers.First";
+	 String server2 = "Servers.Second";
+	 String server3 = "Servers.Third";
+	 String server4 = "Servers.Fourth";
+	 String server5 = "Servers.Fifth";
+		  
+	 double v = 2;
+	 config.addDefault(prefix, "[AGCore]");
+	 config.addDefault(Menu, "Server-List");
+		  
+	 config.addDefault(server1, "Factions");
+	 config.addDefault(server2, "Skyblock");
+	 config.addDefault(server3, "KitPVP");
+	 config.addDefault(server4, "Hub");
+	 config.addDefault(server5, "Pre-Pvp");
+		
+	 config.addDefault(world, "world");
+	 config.addDefault(X, "0");
+	 config.addDefault(Y, "0");
+	 config.addDefault(Z, "0");
+	 config.addDefault(Yaw, "0");
+	 config.addDefault(Pitch, "0");
+	 
+	 config.addDefault("Launchpad.Velocity", v);
+	 List<String> list = new ArrayList<String>();
+	 list.add("world");
+	 list.add("world_nether");
+	 list.add("world_the_end"); 
+
+	 config.set("Launchpad.Enabled.Worlds", list);
+		  
+	 List<String> enableFly = new ArrayList<String>();
+	 enableFly.add("world");
+
+	 config.set("Arena.Fly.Enabled.Worlds", enableFly);
+		  
+	 List<String> disableFly = new ArrayList<String>();
+	 disableFly.add("Disable");
+	 disableFly.add("Worlds");
+	 disableFly.add("Here");
+
+	 config.set("Arena.Fly.Disabled.Worlds", disableFly);
+	 
+	 config.options().copyDefaults(true);
+	 saveConfig();
+	}
+	public void setupMessages()
+	{
+		dFile = new File(this.getDataFolder(), "death_messages.yml");
+		
+		if(!dFile.exists())
+		{
+			try
+			{
+				dFile.createNewFile();
+			}
+			catch(IOException e)
+			{
+				Bukkit.getServer().getConsoleSender()
+				.sendMessage(ChatColor.RED + "Could not create death_messages.yml");
+			}
+		}
+		messages = YamlConfiguration.loadConfiguration(dFile);
+		Bukkit.getServer().getConsoleSender().sendMessage(ChatColor.GOLD + "death_messages.yml has been loaded!");
+		
+		String drowning = "%player% drowned!";
+		String block_explosion = "%player% exploded";
+		String fall = "%player% fell to their death";
+		String falling_block = "%player% was crushed";
+		String fire = "%player% played with fire";
+		String lava = "%player% tried to swim in lava";
+		String lightning = "%player% was struck by lightning";
+		String magic = "%player% played with dark magic";
+		String poison = "%player% was poisoned";
+		String projectile = "%player% was shot";
+		String starvation = "%player% starved to death";
+		String suicide = "%player% took their life";
+		String thorns = "%player% tried to hug a cactus";
+		String wither = "%player% died by wither";
+		String entity_attack = "%player% died";
+		String entity_explosion = "%player% died";
+		String melted = "%player% melted";
+		
+		messages.addDefault("Death.Messages.Drowning", drowning);
+		messages.addDefault("Death.Messages.Block_Explosion", block_explosion);
+		messages.addDefault("Death.Messages.Fall", fall);
+		messages.addDefault("Death.Messages.Falling_Block", falling_block);
+		messages.addDefault("Death.Messages.Fire", fire);
+		messages.addDefault("Death.Messages.Lava", lava);
+		messages.addDefault("Death.Messages.Lightning", lightning);
+		messages.addDefault("Death.Messages.Magic", magic);
+		messages.addDefault("Death.Messages.Poison", poison);
+		messages.addDefault("Death.Messages.Projectile", projectile);
+		messages.addDefault("Death.Messages.Starvation", starvation);
+		messages.addDefault("Death.Messages.Suicide", suicide);
+		messages.addDefault("Death.Messages.Thorns", thorns);
+		messages.addDefault("Death.Messages.Wither", wither);
+		messages.addDefault("Death.Messages.Entity_Attack", entity_attack);
+		messages.addDefault("Death.Messages.Entity_Explosion", entity_explosion);
+		messages.addDefault("Death.Messages.Melted", melted);
+		
+		messages.options().copyDefaults(true);
+        saveMessages();
+		
+	}
+	public void saveConfig()
+	{
+		try
+		{
+			config.save(cFile);
+		}
+		catch(IOException e)
+		{
+			Bukkit.getServer().getConsoleSender()
+			.sendMessage(ChatColor.GREEN + "Could not save config.yml");
+		}
+	}
+	public void saveMessages()
+	{
+		try
+		{
+			messages.save(dFile);
+		}
+		catch(IOException e)
+		{
+			Bukkit.getServer().getConsoleSender()
+			.sendMessage(ChatColor.GREEN + "Could not save death_messages.yml");
+		}
+	}
   public boolean onCommand(CommandSender sender, Command cmd, String label, String[] arg)
   {
 	  Player p = (Player) sender;
 	  String WORLD = p.getWorld().getName();
 	  if(cmd.getName().equalsIgnoreCase("servers"))
+	  {
+		if(sender.hasPermission("core.servers") || sender.hasPermission("core.*"))
+	    {
+			setupMenu();
+			p.openInventory(inv);
+		}
+		else
 		{
-		  if(sender.hasPermission("core.servers") || sender.hasPermission("core.*"))
-	      {
-			  this.addItems();
-			  p.openInventory(inv);
-			}
-			else
-			{
-			 sender.sendMessage("§cYou are misssing the 'core.servers' permission.");
-			 sender.sendMessage("§cPlease contact support.");
-			 return true;
-			}
-		 }
+		    sender.sendMessage("§cYou are misssing the 'core.servers' permission.");
+			sender.sendMessage("§cPlease contact support.");
+			return true;
+		}
+	  }
+	  if(cmd.getName().equalsIgnoreCase("disablefly"))
+	  {
+		  if(sender.hasPermission("core.abilities.fly.disable"))
+		  {
+			  
+			  if(this.getConfig().getStringList("Arena.Fly.Disabled.Worlds").contains(WORLD))
+			  {
+				  sender.sendMessage("§2§lFly >> §aFly has already been disabled for this world.");
+				  return true;
+			  }
+			  List<String> disabledWorld = this.getConfig().getStringList("Arena.Fly.Disabled.Worlds");
+			  disabledWorld.add(WORLD);
+			  this.getConfig().set("Arena.Fly.Disabled.Worlds", disabledWorld);
+			  this.saveConfig();
+			  
+			  List<String> enabledWorld = this.getConfig().getStringList("Arena.Fly.Enabled.Worlds");
+			  enabledWorld.remove(WORLD);
+			  this.getConfig().set("Arena.Fly.Enabled.Worlds", enabledWorld);
+			  this.saveConfig();
+			  
+			  sender.sendMessage("§2§lFly >> §a§lDisabled!");
+			  return true;
+		  }
+		  sender.sendMessage("§cYou are missing the 'core.abilities.fly' permission.");
+		  sender.sendMessage("§cPlease contact support.");
+		  return true;
+	  }
+	  if(cmd.getName().equalsIgnoreCase("enablefly"))
+	  {
+		  if(sender.hasPermission("core.abilities.fly.enable"))
+		  { 
+			  if(this.getConfig().getStringList("Arena.Fly.Enabled.Worlds").contains(WORLD))
+			  {
+				  sender.sendMessage("§2§lFly >> §aFly has already been enabled for this world.");
+				  return true;
+			  }
+			  List<String> disabledWorld = this.getConfig().getStringList("Arena.Fly.Disabled.Worlds");
+			  disabledWorld.remove(WORLD);
+			  this.getConfig().set("Arena.Fly.Disabled.Worlds", disabledWorld);
+			  this.saveConfig();
+			  
+			  List<String> enabledWorld = this.getConfig().getStringList("Arena.Fly.Enabled.Worlds");
+			  enabledWorld.add(WORLD);
+			  this.getConfig().set("Arena.Fly.Enabled.Worlds", enabledWorld);
+			  this.saveConfig();
+			  
+			  sender.sendMessage("§2§lFly >> §a§lEnabled!");
+			  return true;
+		  }
+		  sender.sendMessage("§cYou are missing the 'core.abilities.fly' permission.");
+		  sender.sendMessage("§cPlease contact support.");
+		  return true;
+	  }
 	  if(cmd.getName().equalsIgnoreCase("spawn"))
 	  {
 		  if(!hm.containsKey(p.getName()))
@@ -109,7 +323,7 @@ public class Main
 			  if(sender.hasPermission("core.spawn"))
 			  {
 				  this.hm.put(p.getName(), 0);
-				  p.sendMessage(Main.getInstance().getConfig().getString("Prefix").replace('&', '§') + "§cTeleporting in "+"§c§l3" + " §cseconds..");
+				  p.sendMessage(this.getConfig().getString("Prefix").replace('&', '§') + "§cTeleporting in "+"§c§l3" + " §cseconds..");
 				  BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 				  taskID = scheduler.scheduleSyncRepeatingTask((Plugin) this, new Runnable()
 				  {
@@ -119,11 +333,11 @@ public class Main
 						  if(count == 0)
 						  {
 							  p.sendMessage("§3Teleporting...");
-							  Location loc = new Location(Bukkit.getWorld(Main.getInstance().getConfig().getString("Spawn.Location.World")),
-									  Main.getInstance().getConfig().getDouble("Spawn.Location.X"), 
-									  Main.getInstance().getConfig().getDouble("Spawn.Location.Y"), Main.getInstance().getConfig().getDouble("Spawn.Location.Z"), 
-									  (float) Main.getInstance().getConfig().getDouble("Spawn.Location.Yaw"), 
-									  (float) Main.getInstance().getConfig().getDouble("Spawn.Location.Pitch"));
+							  Location loc = new Location(Bukkit.getWorld(getConfig().getString("Spawn.Location.World")),
+									  getConfig().getDouble("Spawn.Location.X"), 
+									  getConfig().getDouble("Spawn.Location.Y"), getConfig().getDouble("Spawn.Location.Z"), 
+									  (float) getConfig().getDouble("Spawn.Location.Yaw"), 
+									  (float) getConfig().getDouble("Spawn.Location.Pitch"));
 							  p.teleport(loc);
 							  hm.remove(p.getName());
 							  stopTimer();
@@ -197,7 +411,7 @@ public class Main
 			  {
 				  if(sender.hasPermission("core.reload") && sender instanceof Player || sender.hasPermission("core.*"))
 				  {
-					  sender.sendMessage(getConfig().getString("Prefix").replace('&', '§') + (" §cReloading config.."));
+					  sender.sendMessage(this.getConfig().getString("Prefix").replace('&', '§') + (" §cReloading config.."));
 					  BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 					  reloadID = scheduler.scheduleSyncRepeatingTask((Plugin) this, new Runnable()
 					  {
@@ -206,7 +420,7 @@ public class Main
 						  {
 							  if(count == 0)
 							  {
-								  instance.reloadConfig();
+								  reloadConfig();
 								  sender.sendMessage("§aComplete");
 								  stopReload();
 							  }
@@ -244,6 +458,16 @@ public class Main
 	  }
 	  return true;
   }
+  public void reloadConfig()
+  {
+	  if(cFile == null || dFile == null)
+	  {
+		  cFile = new File(getDataFolder(), "config.yml");
+		  dFile = new File(getDataFolder(), "death_messages.yml");
+	  }
+	  config = YamlConfiguration.loadConfiguration(cFile);
+	  messages = YamlConfiguration.loadConfiguration(dFile);
+  }
   
   @EventHandler
   public void onMove(PlayerMoveEvent e)
@@ -267,82 +491,14 @@ public class Main
   {
 	Bukkit.getScheduler().cancelTask(reloadID);
   }
-  public void loadConfig()
-  {
-	  plugin = getDataFolder();
-	  configFile = new File(plugin, "Config.yml");
-	    
-	  config = new YamlConfiguration();
-	  if (!plugin.exists()) 
-	  {
-	    plugin.mkdir();
-	  }
-	  if (!configFile.exists()) 
-	  {
-	    try
-	    {
-	    	this.getLogger().info("Config.yml not found, creating!");
-	   	  configFile.createNewFile();
-	   	this.saveDefaultConfig();
-	    }
-	    catch (IOException e) 
-	    {
-	   	  e.printStackTrace();
-	    }
-	  }
-	  String world = "Spawn.Location.World";
-	  String X = "Spawn.Location.X";
-	  String Y = "Spawn.Location.Y";
-	  String Z = "Spawn.Location.Z";
-	  String Yaw = "Spawn.Location.Yaw";
-	  String Pitch = "Spawn.Location.Pitch";
-	  String prefix = "Prefix";
-	  String server1 = "Servers.First";
-	  String server2 = "Servers.Second";
-	  String server3 = "Servers.Third";
-	  String server4 = "Servers.Fourth";
-	  String server5 = "Servers.Fifth";
-	  
-	  double v = 2;
-	  this.getConfig().addDefault(prefix, "[AGCore]");
-	  this.getConfig().addDefault("Menu-Name", "Servers");
-	  
-	  this.getConfig().addDefault(server1, "Factions");
-	  this.getConfig().addDefault(server2, "Skyblock");
-	  this.getConfig().addDefault(server3, "KitPVP");
-	  this.getConfig().addDefault(server4, "Hub");
-	  this.getConfig().addDefault(server5, "Pre-Pvp");
-	  
-	  this.getConfig().addDefault(world, "world");
-	  this.getConfig().addDefault(X, "0");
-	  this.getConfig().addDefault(Y, "0");
-	  this.getConfig().addDefault(Z, "0");
-	  this.getConfig().addDefault(Yaw, "0");
-	  this.getConfig().addDefault(Pitch, "0");
-	  
-	  this.getConfig().addDefault("Launchpad.Velocity", v);
-	  List<String> list = new ArrayList<String>();
-	  list.add("world");
-	  list.add("world_nether");
-	  list.add("world_the_end");
-
-	  this.getConfig().set("Launchpad.Enabled.Worlds", list);
-	  
-	  this.getConfig().options().copyDefaults(true);
-	  this.saveConfig();
-  }
   public void onDisable() 
   {}
-  public static synchronized Main getInstance()
-  {
-	  return instance;
-  }
   
-  public void addItems()
+  public void setupMenu()
   {
 	  ItemStack bench = new ItemStack (Material.WORKBENCH);
 	  ItemMeta benchMeta = bench.getItemMeta();
-	  benchMeta.setDisplayName("§b" + getConfig().getString("Server.First"));
+	  benchMeta.setDisplayName("§b" + this.getConfig().getString("Servers.First"));
 	  ArrayList<String> lore1 = new ArrayList<String>();
 	  lore1.add("§5♦ Build your base to defend against the enemies!");
 	  lore1.add("");
@@ -354,7 +510,7 @@ public class Main
 	  
 	  ItemStack bucket = new ItemStack (Material.BUCKET);
 	  ItemMeta bucketMeta = bucket.getItemMeta();
-	  bucketMeta.setDisplayName("§b" + getConfig().getString("Server.Second"));
+	  bucketMeta.setDisplayName("§b" + this.getConfig().getString("Servers.Second"));
 	  ArrayList<String> lore2 = new ArrayList<String>();
 	  lore2.add("§5♦ Start on your own or with friends");
 	  lore2.add("§5 to build up your island and compete against others");
@@ -368,7 +524,7 @@ public class Main
 	  
 	  ItemStack sword = new ItemStack (Material.DIAMOND_SWORD);
 	  ItemMeta swordMeta = sword.getItemMeta();
-	  swordMeta.setDisplayName("§b" + getConfig().getString("Server.Third"));
+	  swordMeta.setDisplayName("§b" + this.getConfig().getString("Servers.Third"));
 	  ArrayList<String> lore3 = new ArrayList<String>();
 	  lore3.add("§5♦ Ready to battle head-to-head");
 	  lore3.add("§5 with other players?");
@@ -381,7 +537,7 @@ public class Main
 	  
 	  ItemStack star = new ItemStack (Material.NETHER_STAR);
 	  ItemMeta starMeta = star.getItemMeta();
-	  starMeta.setDisplayName("§b" + getConfig().getString("Server.Fourth"));
+	  starMeta.setDisplayName("§b" + this.getConfig().getString("Servers.Fourth"));
 	  ArrayList<String> lore4 = new ArrayList<String>();
 	  lore4.add("§5♦ Going back to Hub?");
 	  lore4.add("");
@@ -393,7 +549,7 @@ public class Main
 	  
 	  ItemStack isword = new ItemStack (Material.IRON_SWORD);
 	  ItemMeta imeta = isword.getItemMeta();
-	  imeta.setDisplayName("§b" + getConfig().getString("Server.Fifth"));
+	  imeta.setDisplayName("§b" + this.getConfig().getString("Servers.Fifth"));
 	  ArrayList<String> lore5 = new ArrayList<String>();
 	  lore5.add("§5♦ Need some training?");
 	  lore5.add("§5♦ Start your training today!");
@@ -411,7 +567,7 @@ public class Main
   {
 	  Player p = (Player) e.getWhoClicked();
 	  
-	  if(!ChatColor.stripColor(e.getInventory().getName()).equals(getConfig().getString("Menu-Name")))
+	  if(!ChatColor.stripColor(e.getInventory().getName()).equals(getConfig().getString("Menu-name")))
 	  {
 		  return;
 	  }
@@ -425,35 +581,35 @@ public class Main
 		  {
 		    case 0:
 		   		p.closeInventory();
-		   		p.sendMessage("§3Warping to " + Main.getInstance().getConfig().getString("Servers.First") + "...");
-		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.First"));
+		   		p.sendMessage("§3Warping to " + this.getConfig().getString("Servers.First") + "...");
+		   		teleportToServer(p, this.getConfig().getString("Servers.First"));
 		   		break;
 		   	case 2:
 		   		p.closeInventory();
-		   		p.sendMessage("§3Warping to " + Main.getInstance().getConfig().getString("Servers.Second") + "...");
-		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.Second"));
+		   		p.sendMessage("§3Warping to " + this.getConfig().getString("Servers.Second") + "...");
+		   		teleportToServer(p, this.getConfig().getString("Servers.Second"));
 		   		break;
 		   	case 4:
 		   		p.closeInventory();
-		   		p.sendMessage("§3Warping to " + Main.getInstance().getConfig().getString("Servers.Third") + "...");
-		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.Third"));
+		   		p.sendMessage("§3Warping to " + this.getConfig().getString("Servers.Third") + "...");
+		   		teleportToServer(p, getConfig().getString("Servers.Third"));
 		   		break;
 		   	case 6:
 		   		p.closeInventory();
-		   		p.sendMessage("§3Warping to " + Main.getInstance().getConfig().getString("Servers.Fourth") + "...");
-		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.Fourth"));
+		   		p.sendMessage("§3Warping to " + getConfig().getString("Servers.Fourth") + "...");
+		   		teleportToServer(p, getConfig().getString("Servers.Fourth"));
 		  		break;
 		   	case 8:
 		   		p.closeInventory();
-		   		p.sendMessage("§3Warping to " + Main.getInstance().getConfig().getString("Servers.Fifth") + "...");
-		   		teleportToServer(p, Main.getInstance().getConfig().getString("Servers.Fifth"));
+		   		p.sendMessage("§3Warping to " + getConfig().getString("Servers.Fifth") + "...");
+		   		teleportToServer(p, getConfig().getString("Servers.Fifth"));
 		  		break;
 		   	default:
 		   		e.setCancelled(true);
 		   		break;
 		  }
-	    }
 	  }
+  }
   public void teleportToServer(Player player, String server)
   {
 	ByteArrayOutputStream b = new ByteArrayOutputStream();
@@ -467,7 +623,11 @@ public class Main
 	{
 	    e.printStackTrace();
 	}
-	player.sendPluginMessage(Main.getInstance(), "BungeeCord", b.toByteArray());
+	player.sendPluginMessage(this, "BungeeCord", b.toByteArray());
+  }
+  public static Main getInstance() 
+  {
+	  return instance;
   }
   @SuppressWarnings({ "deprecation"})
   private void checkSlots(Inventory inv)

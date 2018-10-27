@@ -22,11 +22,11 @@ public class $1PlayerMoveEvent
     Location playerLoc = player.getLocation();
     int ID = playerLoc.getWorld().getBlockAt(playerLoc).getRelative(0, -1, 0).getTypeId();
     
-    if(Main.getInstance().getConfig().getStringList("Launchpad.Enabled.Worlds").contains(player.getWorld().getName()))
+    if(Main.config.getStringList("Launchpad.Enabled.Worlds").contains(player.getWorld().getName()))
     {
     	if (ID == 165)
         {
-          player.setVelocity(player.getLocation().getDirection().multiply(Main.getInstance().getConfig().getDouble("Launchpad.Velocity")));
+          player.setVelocity(player.getLocation().getDirection().multiply(Main.config.getDouble("Launchpad.Velocity")));
           player.setVelocity(new Vector(player.getVelocity().getX(), 1.0D, player.getVelocity().getZ()));
           player.playEffect(player.getLocation(), Effect.EXPLOSION_HUGE, 1);
           player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_IMPACT, 1.0F, 1.0F);

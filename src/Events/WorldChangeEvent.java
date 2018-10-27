@@ -7,6 +7,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 
+import Core.Main;
+
 public class WorldChangeEvent
   implements Listener
 {
@@ -14,22 +16,22 @@ public class WorldChangeEvent
   public void onWorldChange(PlayerChangedWorldEvent event)
   {
     Player p = event.getPlayer();
-    if (p.getWorld().getName().equalsIgnoreCase("Warzone"))
+    if (Main.config.getStringList("Arena.Fly.Disabled.Worlds").contains(p.getWorld().getName()))
     {
       if (!p.isFlying())
       {
         p.setFlying(false);
         p.setAllowFlight(false);
-        p.sendMessage(ChatColor.GREEN + "You entered" + ChatColor.DARK_RED + 
-          ChatColor.BOLD + " Warzone" + ChatColor.GREEN + "! " + 
+        p.sendMessage(ChatColor.GREEN + "You entered the" + ChatColor.DARK_RED + 
+          ChatColor.BOLD + " Arena" + ChatColor.GREEN + "! " + 
           ChatColor.RED + "Flying Disabled!");
       }
       if (p.isFlying())
       {
         p.setFlying(false);
         p.setAllowFlight(false);
-        p.sendMessage(ChatColor.GREEN + "You entered" + ChatColor.DARK_RED + 
-          ChatColor.BOLD + " Warzone" + ChatColor.GREEN + "! " + 
+        p.sendMessage(ChatColor.GREEN + "You entered the" + ChatColor.DARK_RED + 
+          ChatColor.BOLD + " Arena" + ChatColor.GREEN + "! " + 
           ChatColor.RED + "Flying Disabled!");
       }
       if (p.getGameMode() == GameMode.CREATIVE)
@@ -56,8 +58,8 @@ public class WorldChangeEvent
         {
           p.setFlying(false);
           p.setAllowFlight(false);
-          p.sendMessage(ChatColor.GREEN + "You entered" + ChatColor.DARK_RED + 
-            ChatColor.BOLD + " Warzone" + ChatColor.GREEN + "! " + 
+          p.sendMessage(ChatColor.GREEN + "You entered the" + ChatColor.DARK_RED + 
+            ChatColor.BOLD + " Arena" + ChatColor.GREEN + "! " + 
             ChatColor.RED + "Flying Disabled!");
         }
         if (p.getGameMode() == GameMode.CREATIVE)
@@ -85,16 +87,14 @@ public class WorldChangeEvent
         {
           p.setFlying(false);
           p.setAllowFlight(false);
-          p.sendMessage(ChatColor.BLUE + "[Duels]" + 
-            ChatColor.DARK_RED + ChatColor.BOLD + " Entered Arena: " + 
-            ChatColor.RED + "Flying Disabled!");
+          p.sendMessage(ChatColor.DARK_RED +""+ ChatColor.BOLD + " Entered Arena: " + 
+                  ChatColor.RED + "Flying Disabled!");
         }
         if (p.isFlying())
         {
           p.setFlying(false);
           p.setAllowFlight(false);
-          p.sendMessage(ChatColor.BLUE + "[Duels]" + 
-            ChatColor.DARK_RED + ChatColor.BOLD + " Entered Arena: " + 
+          p.sendMessage(ChatColor.DARK_RED +""+ ChatColor.BOLD + " Entered Arena: " + 
             ChatColor.RED + "Flying Disabled!");
         }
         if (p.getGameMode() == GameMode.CREATIVE)
@@ -121,9 +121,8 @@ public class WorldChangeEvent
           {
             p.setFlying(false);
             p.setAllowFlight(false);
-            p.sendMessage(ChatColor.BLUE + "[Duels]" + 
-              ChatColor.DARK_RED + ChatColor.BOLD + " Entered Arena: " + 
-              ChatColor.RED + "Flying Disabled!");
+            p.sendMessage(ChatColor.DARK_RED +""+ ChatColor.BOLD + " Entered Arena: " + 
+                    ChatColor.RED + "Flying Disabled!");
           }
           if (p.getGameMode() == GameMode.CREATIVE)
           {

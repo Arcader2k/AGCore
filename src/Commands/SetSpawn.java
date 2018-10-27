@@ -20,20 +20,20 @@ public class SetSpawn implements CommandExecutor
 		  {
 			  if(sender.hasPermission("core.setspawn"))
 			  {
-				  Location loc = new Location(Bukkit.getWorld(Main.getInstance().getConfig().getString("Spawn.World")),
-						  Main.getInstance().getConfig().getDouble("Spawn.X"), 
-						  Main.getInstance().getConfig().getDouble("Spawn.Y"), Main.getInstance().getConfig().getDouble("Spawn.Z"));
-				  Main.getInstance().getServer().getWorld(Main.getInstance().getConfig().getString("Spawn.World")).setSpawnLocation(loc);
+				  Location loc = new Location(Bukkit.getWorld(Main.config.getString("Spawn.Location.World")),
+						  Main.config.getDouble("Spawn.Location.X"), 
+						  Main.config.getDouble("Spawn.Location.Y"), Main.config.getDouble("Spawn.Location.Z"));
+				  Bukkit.getServer().getWorld(Main.config.getString("Spawn.Location.World")).setSpawnLocation(loc);
 				  
-				  Main.getInstance().getConfig().set("Spawn.World", p.getWorld().getName());
-				  Main.getInstance().getConfig().set("Spawn.X", p.getLocation().getX());
-				  Main.getInstance().getConfig().set("Spawn.Y", p.getLocation().getY());
-				  Main.getInstance().getConfig().set("Spawn.Z", p.getLocation().getZ());
-				  Main.getInstance().getConfig().set("Spawn.Yaw", p.getLocation().getYaw());
-				  Main.getInstance().getConfig().set("Spawn.Pitch", p.getLocation().getPitch());
+				  Main.config.set("Spawn.Location.World", p.getWorld().getName());
+				  Main.config.set("Spawn.Location.X", p.getLocation().getX());
+				  Main.config.set("Spawn.Location.Y", p.getLocation().getY());
+				  Main.config.set("Spawn.Location.Z", p.getLocation().getZ());
+				  Main.config.set("Spawn.Location.Yaw", p.getLocation().getYaw());
+				  Main.config.set("Spawn.Location.Pitch", p.getLocation().getPitch());
 				  Main.getInstance().saveConfig();
 				  
-				  sender.sendMessage(Main.getInstance().getConfig().getString("Prefix") + " §aSpawn Set!");
+				  sender.sendMessage(Main.config.getString("Prefix") + " §aSpawn Set!");
 				  return true;
 			  }
 			  else
