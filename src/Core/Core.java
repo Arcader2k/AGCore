@@ -160,11 +160,11 @@ public class Core extends JavaPlugin implements Listener
 	    message = (String)contents.get(selected);
 	    if (!message.equals(event.getDeathMessage()))
 	    {
-	      Player plyr = event.getEntity();
-	      message = message.replace("%player%", plyr.getName());
+	      Player pl = event.getEntity();
+	      message = message.replace("%player%", pl.getName());
 	      if (message.contains("%killer%"))
 	      {
-	        Player kllr = plyr.getKiller();
+	        Player kllr = pl.getKiller();
 	        if (kllr == null)
 	        {
 	          contents.remove(selected);
@@ -312,10 +312,8 @@ public class Core extends JavaPlugin implements Listener
 		}
 		return false;
 	}
-	public void stopTimer()
-	{
-		Bukkit.getScheduler().cancelTask(taskID);
-	}
+	public void stopTimer(){Bukkit.getScheduler().cancelTask(taskID);}
+	
 	@EventHandler
 	public void onMove(PlayerMoveEvent e)
 	{
