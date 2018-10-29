@@ -69,7 +69,6 @@ public class Core extends JavaPlugin implements Listener
 		this.damager = new HashSet();
 	    this.damager.addAll(Arrays.asList(EntityType.values()));
 	    this.damager.addAll(Arrays.asList(EntityDamageEvent.DamageCause.values()));
-	    this.damager.addAll(Arrays.asList(OtherDeaths.values()));
 	    this.EventsFolder = new File(getDataFolder(), "Death Events");
 	    createFolder(this.EventsFolder);
 	    createDeathFiles();
@@ -96,8 +95,7 @@ public class Core extends JavaPlugin implements Listener
 	    c.sendMessage("§2Author: §aArcader2k");
 	    c.sendMessage("§b----------------------------------------");
 		
-	}
-	public static enum OtherDeaths{GROUND;}  
+	} 
 	private void createFolder(File file){if (!file.exists()){file.mkdirs();}}  
 	private void createDeathFiles(){for (Enum<?> e : this.damager){createDeathFile(e);}}  
 	private void createDeathFile(Enum<?> e)
@@ -133,10 +131,6 @@ public class Core extends JavaPlugin implements Listener
 	          e = livingEntity.getType();
 	        }
 	      }
-	    }
-	    else if ((e == EntityDamageEvent.DamageCause.FALL) && (player.getFallDistance() <= 5.0F))
-	    {
-	      e = OtherDeaths.GROUND;
 	    }
 	    String deathMessage = getDeathMessage(event, e);
 	    event.setDeathMessage(deathMessage);
@@ -317,7 +311,6 @@ public class Core extends JavaPlugin implements Listener
 			 }
 		}
 		return false;
-		
 	}
 	public void stopTimer()
 	{
