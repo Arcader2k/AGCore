@@ -1,20 +1,21 @@
 name: AGCore
-version: 4.8.3
-main: Core.Main
+version: 4.8.5
+main: Core.Core
 description: AGCore
 
 commands:
     servers:
         description: Opens server list menu
+        permission: core.servers
     setspawn:
         description: Sets the players current location to the Config
+        permission: core.setspawn
     spawn:
         description: Teleports the player to the set location    
+        permission: core.spawn
     lp:
         description: Usage >> /lp <enable/disable>
+        permission: core.launchpads
     core:
         description: Usage >> /core info
-    enablefly:
-        description: Usage >> /enablefly
-    disablefly:
-        description: Usage >> /disablefly
+        permission: core.use

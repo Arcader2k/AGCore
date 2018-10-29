@@ -9,7 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
-import Core.Main;
+import Core.Core;
 
 public class $1PlayerMoveEvent
   implements Listener
@@ -22,11 +22,11 @@ public class $1PlayerMoveEvent
     Location playerLoc = player.getLocation();
     int ID = playerLoc.getWorld().getBlockAt(playerLoc).getRelative(0, -1, 0).getTypeId();
     
-    if(Main.config.getStringList("Launchpad.Enabled.Worlds").contains(player.getWorld().getName()))
+    if(Core.config.getStringList("Launchpad.Enabled.Worlds").contains(player.getWorld().getName()))
     {
     	if (ID == 165)
         {
-          player.setVelocity(player.getLocation().getDirection().multiply(Main.config.getDouble("Launchpad.Velocity")));
+          player.setVelocity(player.getLocation().getDirection().multiply(Core.config.getDouble("Launchpad.Velocity")));
           player.setVelocity(new Vector(player.getVelocity().getX(), 1.0D, player.getVelocity().getZ()));
           player.playEffect(player.getLocation(), Effect.EXPLOSION_HUGE, 1);
           player.playSound(player.getLocation(), Sound.ENTITY_LIGHTNING_IMPACT, 1.0F, 1.0F);

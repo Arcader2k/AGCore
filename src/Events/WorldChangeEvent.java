@@ -7,7 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 
-import Core.Main;
+import Core.Core;
 
 public class WorldChangeEvent
   implements Listener
@@ -16,7 +16,7 @@ public class WorldChangeEvent
   public void onWorldChange(PlayerChangedWorldEvent event)
   {
     Player p = event.getPlayer();
-    if (Main.config.getStringList("Arena.Fly.Disabled.Worlds").contains(p.getWorld().getName()))
+    if (Core.config.getStringList("Arena.Fly.Disabled.Worlds").contains(p.getWorld().getName()))
     {
       if (!p.isFlying())
       {
