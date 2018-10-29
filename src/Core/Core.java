@@ -51,7 +51,7 @@ public class Core extends JavaPlugin implements Listener
 	private int taskID;
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public HashMap<String, Integer> hm = new HashMap();
-	private File deathMessagesFolder;
+	private File EventsFolder;
 	private Set<Enum<?>> damager;
 	private static Core instance;
 	public static File plugin;
@@ -70,8 +70,8 @@ public class Core extends JavaPlugin implements Listener
 	    this.damager.addAll(Arrays.asList(EntityType.values()));
 	    this.damager.addAll(Arrays.asList(EntityDamageEvent.DamageCause.values()));
 	    this.damager.addAll(Arrays.asList(OtherDeaths.values()));
-	    this.deathMessagesFolder = new File(getDataFolder(), "Death Messages");
-	    createFolder(this.deathMessagesFolder);
+	    this.EventsFolder = new File(getDataFolder(), "Death Events");
+	    createFolder(this.EventsFolder);
 	    createDeathFiles();
 	    createConfig();
 		
@@ -102,7 +102,7 @@ public class Core extends JavaPlugin implements Listener
 	private void createDeathFiles(){for (Enum<?> e : this.damager){createDeathFile(e);}}  
 	private void createDeathFile(Enum<?> e)
 	{
-	   File f = new File(this.deathMessagesFolder, e.toString() + ".txt");
+	   File f = new File(this.EventsFolder, e.toString() + ".txt");
 	   try
 	   {
 	     f.createNewFile();
@@ -144,14 +144,14 @@ public class Core extends JavaPlugin implements Listener
 	  
 	private String getDeathMessage(PlayerDeathEvent event, Enum<?> e)
 	{
-	  File file = new File(this.deathMessagesFolder, e.toString() + ".txt");
+	  File file = new File(this.EventsFolder, e.toString() + ".txt");
 	  String message = event.getDeathMessage();
 	  if (file.exists())
 	  {
 	    List<String> contents = getFileContents(file);
 	    message = configureDeathMessage(event, contents);
 	  }
-	  else{getLogger().warning("Could not find the file: " + file.getName());
+	  else{getLogger().warning("Could not reach the " + file.getName() + " file");
 	  }
 	  return message;
 	}  
@@ -166,11 +166,6 @@ public class Core extends JavaPlugin implements Listener
 	    message = (String)contents.get(selected);
 	    if (!message.equals(event.getDeathMessage()))
 	    {
-	      if (message.startsWith("###")) {
-	        message = message.replaceFirst("###", "");
-	      } else {
-	        message ="" + message;
-	      }
 	      Player plyr = event.getEntity();
 	      message = message.replace("%player%", plyr.getName());
 	      if (message.contains("%killer%"))
@@ -232,18 +227,18 @@ public class Core extends JavaPlugin implements Listener
 	    }
 	    catch (Exception e)
 	    {
-	      getLogger().warning("Failed to read the file " + file.getName());
+	      getLogger().warning("Unable to reach the " + file.getName() + " file");
 	      e.printStackTrace();
 	    }
 	    return list;
 	}
 	public void reloadConfig()
 	{
-	  if(configFile == null)
+	  if(configFile != null)
 	  {
-		  configFile = new File(plugin, "Config.yml");
+		  config = YamlConfiguration.loadConfiguration(configFile);
 	  }
-	  config = YamlConfiguration.loadConfiguration(configFile);
+	  configFile = new File(plugin, "Config.yml");
 	}
 	public boolean onCommand(CommandSender s, Command c, String a, String[] str)
 	{
@@ -292,7 +287,7 @@ public class Core extends JavaPlugin implements Listener
 					 this.hm.put(p.getName(), Integer.valueOf(0));
 					 p.sendMessage(config.getString("Prefix").replace('&', '§') + " §cTeleporting in "+"§c§l3" + " §cseconds..");
 					 BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-					 this.taskID = scheduler.scheduleSyncRepeatingTask(Core.getInstance(), new Runnable()
+					 this.taskID = scheduler.scheduleSyncRepeatingTask(this, new Runnable()
 					 {
 					    @Override
 						public void run()
