@@ -1,5 +1,5 @@
 name: AGCore
-version: 4.8.5
+version: 5.0.2
 main: Core.Core
 description: AGCore
 
@@ -15,7 +15,7 @@ commands:
         permission: core.spawn
     lp:
         description: Usage >> /lp <enable/disable>
-        permission: core.launchpads
+        permission: core.launchpads.use
     core:
         description: Usage >> /core info
         permission: core.use

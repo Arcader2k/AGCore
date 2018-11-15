@@ -43,7 +43,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import Commands.CoreCmd;
+import Commands.LaunchPads;
 import Events.VoidSpawn;
+import Events.$1PlayerMoveEvent;
 
 public class Core extends JavaPlugin implements Listener 
 {
@@ -58,6 +60,7 @@ public class Core extends JavaPlugin implements Listener
 	public static File configFile;
 	public static FileConfiguration config;
 	private CoreCmd ccmd;
+	private LaunchPads lpcmd;
 	ConsoleCommandSender c;
 	Inventory inv = Bukkit.createInventory(null, 9, ChatColor.RED + "Available Servers");
 	
@@ -65,6 +68,8 @@ public class Core extends JavaPlugin implements Listener
 	public void onEnable()
 	{
 		this.ccmd = new CoreCmd();
+		this.lpcmd = new LaunchPads();
+		
 		
 		this.damager = new HashSet();
 	    this.damager.addAll(Arrays.asList(EntityType.values()));
@@ -78,11 +83,13 @@ public class Core extends JavaPlugin implements Listener
 		getCommand("spawn").setExecutor(this);
 		getCommand("core").setExecutor(this.ccmd);
 		getCommand("servers").setExecutor(this);
+		getCommand("lp").setExecutor(this.lpcmd);
 		
 		Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 		
 		getServer().getPluginManager().registerEvents(this, this);
 		getServer().getPluginManager().registerEvents(new VoidSpawn(), this);
+		getServer().getPluginManager().registerEvents(new $1PlayerMoveEvent(),  this);
 		
 		c = Bukkit.getServer().getConsoleSender();
 		c.sendMessage("§b----------- [ §aAGCore §b]-----------");
@@ -149,7 +156,7 @@ public class Core extends JavaPlugin implements Listener
 	  }
 	  return message;
 	}  
-	  @SuppressWarnings("deprecation")
+	@SuppressWarnings("deprecation")
 	private String configureDeathMessage(PlayerDeathEvent event, List<String> contents)
 	{
 	  String message = event.getDeathMessage();
@@ -232,7 +239,6 @@ public class Core extends JavaPlugin implements Listener
 	  {
 		  config = YamlConfiguration.loadConfiguration(configFile);
 	  }
-	  configFile = new File(plugin, "Config.yml");
 	}
 	public boolean onCommand(CommandSender s, Command c, String a, String[] str)
 	{
@@ -344,7 +350,6 @@ public class Core extends JavaPlugin implements Listener
 			{
 				getLogger().info("Config.yml not found.. Creating one for you!");
 				configFile.createNewFile();
-				this.saveDefaultConfig();
 			}
 			catch(IOException e)
 			{
@@ -366,23 +371,23 @@ public class Core extends JavaPlugin implements Listener
 		String server5 = "Servers.Fifth";
 			  
 		double v = 2;
-		config.addDefault(prefix, "[AGCore]");
-		config.addDefault(Menu, "Server-List");
+		config.set(prefix, "[AGCore]");
+		config.set(Menu, "Server-List");
 			  
-		config.addDefault(server1, "Factions");
-		config.addDefault(server2, "Skyblock");
-		config.addDefault(server3, "KitPVP");
-		config.addDefault(server4, "Hub");
-		config.addDefault(server5, "Pre-Pvp");
-			
-		config.addDefault(world, "world");
-		config.addDefault(X, "100");
-		config.addDefault(Y, "100");
-		config.addDefault(Z, "100");
-		config.addDefault(Yaw, "100");
-		config.addDefault(Pitch, "100");
+		config.set(server1, "Factions");
+		config.set(server2, "Skyblock");
+		config.set(server3, "KitPVP");
+		config.set(server4, "Hub");
+		config.set(server5, "Pre-Pvp");
+		
+		config.set(world, "world");
+		config.set(X, "100");
+		config.set(Y, "100");
+		config.set(Z, "100");
+		config.set(Yaw, "100");
+		config.set(Pitch, "100");
 		 
-		config.addDefault("Launchpad.Velocity", v);
+		config.set("Launchpad.Velocity", v);
 		List<String> list = new ArrayList<String>();
 		list.add("world");
 		list.add("world_nether");
@@ -390,33 +395,21 @@ public class Core extends JavaPlugin implements Listener
 
 		config.set("Launchpad.Enabled.Worlds", list);
 			  
-		List<String> enableFly = new ArrayList<String>();
-		enableFly.add("world");
+		List<String> disabled = new ArrayList<String>();
+		disabled.add("Disable");
+		disabled.add("Worlds");
+		disabled.add("Here");
 
-		config.set("Arena.Fly.Enabled.Worlds", enableFly);
-			  
-		List<String> disableFly = new ArrayList<String>();
-		disableFly.add("Disable");
-		disableFly.add("Worlds");
-		disableFly.add("Here");
-
-		config.set("Arena.Fly.Disabled.Worlds", disableFly);
-	    config.options().copyDefaults(true);
-	    this.saveConfig();
-	}
-	public void saveConfig()
-	{
-		try
-		{
+		config.set("Launchpad.Disabled.Worlds", disabled);
+		try {
 			config.save(configFile);
-		}
-		catch(IOException e)
-		{
-			Bukkit.getServer().getConsoleSender()
-			.sendMessage(ChatColor.GREEN + "Could not save config.yml");
+		} catch (IOException e) {
+			e.printStackTrace();
+			Bukkit.getConsoleSender()
+			.sendMessage("Could not save the Config.yml");
 		}
 	}
-	public void onDisable() {}
+	public void onDisable(){}
 	public void addItems()
 	{
 		  ItemStack bench = new ItemStack (Material.WORKBENCH);
@@ -531,8 +524,8 @@ public class Core extends JavaPlugin implements Listener
 			   		e.setCancelled(true);
 			   		break;
 			  }
-		    }
-		  }
+		 }
+	  }
 	  public void teleportToServer(Player player, String server)
 	  {
 		ByteArrayOutputStream b = new ByteArrayOutputStream();
@@ -551,18 +544,18 @@ public class Core extends JavaPlugin implements Listener
 	  public static Core getInstance() {return instance;}
 	  @SuppressWarnings({ "deprecation"})
 	  private void checkSlots(Inventory inv)
-		{
-		    ItemStack space;
-		    space = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.WHITE.getDyeData());
-		    ItemMeta meta = space.getItemMeta();
-		    meta.setDisplayName(ChatColor.BLACK + "");
-		    space.setItemMeta(meta);
-		    for(int i = 0;i < inv.getSize();i++)
-		    {
-		        if(inv.getItem(i) == (null) || inv.getItem(i).getType() == Material.AIR)
-		        {
-		            inv.setItem(i, space);
-		        }
-		    }
-		}
+	  {
+		  ItemStack space;
+		  space = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.WHITE.getDyeData());
+		  ItemMeta meta = space.getItemMeta();
+		  meta.setDisplayName(ChatColor.BLACK + "");
+		  space.setItemMeta(meta);
+		  for(int i = 0;i < inv.getSize();i++)
+		  {
+		      if(inv.getItem(i) == (null) || inv.getItem(i).getType() == Material.AIR)
+		      {
+		          inv.setItem(i, space);
+		      }
+		  }
+	  }
 }

@@ -21,39 +21,39 @@ public class CoreCmd implements CommandExecutor
 
 	@Override
 	public boolean onCommand(CommandSender s, Command c, String st, String[] a) {
-		@SuppressWarnings("unused")
-		Player p = (Player) s;
-		if(c.getName().equalsIgnoreCase("core"))
+	@SuppressWarnings("unused")
+	Player p = (Player) s;
+	if(c.getName().equalsIgnoreCase("core"))
+    {
+	  if(a.length == 1)
+	  {
+		  if(a[0].equalsIgnoreCase("reload"))
 		  {
-			  if(a.length == 1)
+			  if(s.hasPermission("core.reload") && s instanceof Player || s.hasPermission("core.*"))
 			  {
-				  if(a[0].equalsIgnoreCase("reload"))
+				  s.sendMessage(Core.config.getString("Prefix").replace('&', '§') + (" §cReloading config.."));
+				  BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+				  reloadID = scheduler.scheduleSyncRepeatingTask(Core.getInstance(), new Runnable()
 				  {
-					  if(s.hasPermission("core.reload") && s instanceof Player || s.hasPermission("core.*"))
+					@Override
+					  public void run()
 					  {
-						  s.sendMessage(Core.config.getString("Prefix").replace('&', '§') + (" §cReloading config.."));
-						  BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-						  reloadID = scheduler.scheduleSyncRepeatingTask(Core.getInstance(), new Runnable()
+						  if(count == 0)
 						  {
-							@Override
-							  public void run()
-							  {
-								  if(count == 0)
-								  {
-									  Core.getInstance().reloadConfig();
-									  s.sendMessage("§aComplete");
-									  stopReload();
-								  }
-							  }
-						  }, 40L, 20L);
-						  return true; 
+							  Core.getInstance().reloadConfig();
+							  s.sendMessage("§aComplete");
+							  stopReload();
+						  }
 					  }
-					  s.sendMessage("§cYou are missing the 'core.reload' permission.");
-					  s.sendMessage("§cPlease contact support.");
-					  return true;
-				  }
+				  }, 40L, 20L);
+				  return true; 
 			  }
+			  s.sendMessage("§cYou are missing the 'core.reload' permission.");
+			  s.sendMessage("§cPlease contact support.");
+			  return true;
 		  }
-		return true;
+	  }
+	 }
+	return true;
 	}
 }

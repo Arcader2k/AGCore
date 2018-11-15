@@ -25,13 +25,14 @@ public class VoidSpawn
         }
 	}
 	public static void reSpawn(Player player) 
-	  {
-		  Location loc = new Location(Bukkit.getWorld(Core.config.getString("Spawn.World")),
-				  Core.config.getDouble("Spawn.X"), 
-				  Core.config.getDouble("Spawn.Y"), 
-				  Core.config.getDouble("Spawn.Z"), 
-				  (float) Core.config.getDouble("Spawn.Yaw"), 
-				  (float) Core.config.getDouble("Spawn.Pitch"));
-		  player.teleport(loc);
-	  }
+	{
+	  Location loc = new Location(Bukkit.getWorld(Core.config.getString("Spawn.Location.World")),
+			  Core.config.getDouble("Spawn.Location.X"), 
+			  Core.config.getDouble("Spawn.Location.Y"), 
+			  Core.config.getDouble("Spawn.Location.Z"), 
+			  (float) Core.config.getDouble("Spawn.Location.Yaw"), 
+			  (float) Core.config.getDouble("Spawn.Location.Pitch"));
+	  player.teleport(loc);
+	  return;
+	}
 }
